@@ -1,1 +1,2 @@
-# hotel_management_sys
+# Hotel Management System
+## INST 326 Final Group Project
