@@ -65,10 +65,18 @@ class Reservation:
 
     def __init__(self, hotel, rooms, guest, check_in_date_time, check_out_date_time):
         self.hotel = hotel
-        self.room = rooms
+        self.rooms = rooms
         self.guest = guest
         self.check_in_date_time = check_in_date_time
         self.check_out_date_time = check_out_date_time
+
+    def __repr__(self):
+        return f"Reservation({repr(self.hotel)}, {[repr(room) for room in self.rooms]}, \
+            {repr(self.check_in_date_time)}, {repr(self.check_out_date_time)})"
+
+    def __str__(self):
+        return f"Reservation for {self.guest.name} checking into {self.hotel.name} on {self.check_in_date_time} \
+            and checking out on {self.check_out_date_time}"
 
     def check_in(self):
         """ Checks in the guest to the hotel.
@@ -101,7 +109,7 @@ class Reservation:
             Modifies the check_out_date_time attribute by adding the hours to it.
 
         Returns:
-            Returns the new checkout date and time.
+            (datetime): The new checkout date and time.
         """
         pass
 
@@ -119,6 +127,6 @@ class Reservation:
             Modifies the check_in_date_time attribute by stubtracting hours from it.
 
         Returns:
-            The new checkin time.
+            (datetime): The new checkin time.
         """
         pass
