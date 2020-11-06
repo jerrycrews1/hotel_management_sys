@@ -9,10 +9,10 @@ class Room:
         rm_number (str): The room number.
         clearn (bool): True if the room is clean, else false.
                        Set to True by default.
+         cost (float): The cost of the room.
 
     Args:
         rm_number (str): The room number.
-        cost (float): The cost of the room.
     """
 
     def __init__(self, rm_number):
@@ -32,7 +32,7 @@ class Hotel:
         name (str): The name of the hotel.
     """
 
-    def __init__(self, name):
+    def __init__(self, name, tax_perc):
         self.name = name
 
 
