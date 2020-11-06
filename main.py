@@ -7,9 +7,9 @@ class Room:
 
     Attributes:
         rm_number (str): The room number.
-        clearn (bool): True if the room is clean, else false.
+        clean (bool): True if the room is clean, else false.
                        Set to True by default.
-         cost (float): The cost of the room.
+        cost (float): The cost of the room.
 
     Args:
         rm_number (str): The room number.
@@ -17,7 +17,7 @@ class Room:
 
     def __init__(self, rm_number):
         self.rm_number = rm_number
-        self.clearn = True
+        self.clean = True
 
 
 class Hotel:
