@@ -44,14 +44,55 @@ class Reservation:
         rooms (list of objs): List of room objects.
         guest (obj): The guest who is making the reservation.
         cost (float): The cost of the reservation.
+        check_in_date (datetime): The date the guest will check in.
+        check_out_date (datetime): The date the guest will check out.
 
     Args:
         hotel (obj): A hotel object.
         rooms (list of objs): List of room objects.
         guest (obj): The guest who is making the reservation.
+        check_in_date_time (datetime): The date the guest will check in.
+        check_out_date_time (datetime): The date the guest will check out.
     """
 
-    def __init__(self, hotel, rooms, guest):
+    def __init__(self, hotel, rooms, guest, check_in_date_time, check_out_date_time):
         self.hotel = hotel
         self.room = rooms
-        self. guest = guest
+        self.guest = guest
+        self.check_in_date_time = check_in_date_time
+        self.check_out_date_time = check_out_date_time
+
+    def check_in(self):
+        """ Checks in the guest to the hotel.
+
+        Side Effects:
+            Changes the room object's clean attribute to False.
+            Changes the room object's occupied attribute to True.
+
+        """
+        pass
+
+    def check_out(self):
+        """ Checks out the guest from the hotel.
+
+        Side Effects:
+            Changes the room object's occupied attribute to False.
+        """
+        pass
+
+    def late_checkout(self, hours):
+        """ Gives the guest a late checkout.
+
+        This method checks if the guest already has a late checkout
+        and if they don't, adds the hours to the checkout time.
+
+        Args:
+            hours (int): The number of hours to add to the checkout time.
+
+        Side Effects:
+            Modifies the check_out_date_time attribute by adding the hours to it.
+
+        Returns:
+            Returns the new checkout time.
+        """
+        pass
