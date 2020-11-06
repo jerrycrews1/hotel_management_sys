@@ -2,8 +2,6 @@
 
 This module allows a hotel receptionist or manager to perform various functions
 necessary for operating a hotel.
-
-
 """
 
 
@@ -15,17 +13,28 @@ class Room:
         clean (bool): True if the room is clean, else false.
                       Set to True by default.
         cost (float): The cost of the room.
-        type (str): The type of room (double, king, etc)
+        type (str): The type of room (double, king, etc).
         occupied (bool): True if room is occupied, else False.
                          Set to False by default.
-
-    Args:
-        rm_number (str): The room number.
+        handicap (bool): True if room is handicap accessible, else False.
     """
 
-    def __init__(self, rm_number):
+    def __init__(self, rm_number, type, handicap):
+        """ Initializes a Room object.
+
+        Args:
+            rm_number (str): The room number.
+            type (str): The type of room (double, king, etc).
+            handicap (bool): Whether a room is handicap accessible or not.
+
+        Side Effects:
+            Sets the rm_number, clean, cost, type, and occupied attributes.
+        """
         self.rm_number = rm_number
         self.clean = True
+        self.occupied = False
+        self.type = str()
+        self.cost = float()
 
 
 class Hotel:
@@ -35,28 +44,34 @@ class Hotel:
         name (str): The name of the hotel.
         tax_perc (float): The tax percentage the hotel is subject to.
         rooms (list of objs): The rooms belonging to the hotel.
-
-    Args:
-        name (str): The name of the hotel.
     """
 
     def __init__(self, name, tax_perc, rooms):
-        self.name = name
-        self.rooms={}
-        self.tax_perc=tax_perc
+        """ Initializes a Hotel object.
 
-        room_list = [x for x in range(1,21)] 
-        roomtype=['single', 'double', 'queen', 'king']
+        Args:
+            name (str): The name of the hotel.
+            tax_perc (float): The tax percentage the hotel is subject to.
+            rooms (list of objs): The rooms belonging to the hotel.
+
+        Side Effects:
+            Sets the name, rooms, and tax_perc attribute attributes.
+        """
+        self.name = name
+        self.rooms = {}
+        self.tax_perc = tax_perc
+
+        room_list = [x for x in range(1, 21)]
+        roomtype = ['single', 'double', 'queen', 'king']
         for num in room_list:
-            if num <=5 :
-                self.rooms.update({num:roomtype[0]})
-            elif 6<=num <=10:
-                self.rooms.update({num:roomtype[1]})
-            elif 11<=num <=15:
-                self.rooms.update({num:roomtype[2]})
-            elif 14<=num <=20:
-                self.rooms.update({num:roomtype[3]})
-    
+            if num <= 5:
+                self.rooms.update({num: roomtype[0]})
+            elif 6 <= num <= 10:
+                self.rooms.update({num: roomtype[1]})
+            elif 11 <= num <= 15:
+                self.rooms.update({num: roomtype[2]})
+            elif 14 <= num <= 20:
+                self.rooms.update({num: roomtype[3]})
 
 
 class Reservation:
@@ -69,16 +84,22 @@ class Reservation:
         cost (float): The cost of the reservation.
         check_in_date (datetime): The date the guest will check in.
         check_out_date (datetime): The date the guest will check out.
-
-    Args:
-        hotel (obj): A hotel object.
-        rooms (list of objs): List of room objects.
-        guest (obj): The guest who is making the reservation.
-        check_in_date_time (datetime): The date the guest will check in.
-        check_out_date_time (datetime): The date the guest will check out.
     """
 
     def __init__(self, hotel, rooms, guest, check_in_date_time, check_out_date_time):
+        """ Initializes a Reservation object.
+
+        Args:
+            hotel (obj): A hotel object.
+            rooms (list of objs): List of room objects.
+            guest (obj): The guest who is making the reservation.
+            check_in_date_time (datetime): The date the guest will check in.
+            check_out_date_time (datetime): The date the guest will check out.
+
+        Side Effects:
+            Sets the hotel, rooms, guest, check_in_date_time, and the check_out_date_time attributes.
+        """
+
         self.hotel = hotel
         self.rooms = rooms
         self.guest = guest
@@ -118,7 +139,7 @@ class Reservation:
         and if they don't, adds the hours to the checkout time.
 
         Args:
-            hours (int): The number of hours to add to the checkout time.
+            hours(int): The number of hours to add to the checkout time.
 
         Side Effects:
             Modifies the check_out_date_time attribute by adding the hours to it.
@@ -136,7 +157,7 @@ class Reservation:
         reservation's late checkout.
 
         Args:
-            hours (int): The number of hours to subtract from the checkin time.
+            hours(int): The number of hours to subtract from the checkin time.
 
         Side Effects:
             Modifies the check_in_date_time attribute by stubtracting hours from it.
