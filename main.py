@@ -1,4 +1,9 @@
 """ Hotel Management System.
+
+This module allows a hotel receptionist or manager to perform various functions
+necessary for operating a hotel.
+
+
 """
 
 
@@ -96,6 +101,24 @@ class Reservation:
             Modifies the check_out_date_time attribute by adding the hours to it.
 
         Returns:
-            Returns the new checkout time.
+            Returns the new checkout date and time.
+        """
+        pass
+
+    def early_checkin(self, hours):
+        """ Gives the guest an early checkin.
+
+        This method checks if an early checkin has already been given.  It then
+        checks to ensure that giving an early checkin doesn't interfere with another
+        reservation's late checkout.
+
+        Args:
+            hours (int): The number of hours to subtract from the checkin time.
+
+        Side Effects:
+            Modifies the check_in_date_time attribute by stubtracting hours from it.
+
+        Returns:
+            The new checkin time.
         """
         pass
