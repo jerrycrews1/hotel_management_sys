@@ -32,8 +32,23 @@ class Hotel:
         name (str): The name of the hotel.
     """
 
-    def __init__(self, name, tax_perc):
+    def __init__(self, name, tax_perc, rooms):
         self.name = name
+        self.rooms={}
+        self.tax_perc=tax_perc
+
+        room_list = [x for x in range(1,21)] 
+        roomtype=['single', 'double', 'queen', 'king']
+        for num in room_list:
+            if num <=5 :
+                self.rooms.update({num:roomtype[0]})
+            elif 6<=num <=10:
+                self.rooms.update({num:roomtype[1]})
+            elif 11<=num <=15:
+                self.rooms.update({num:roomtype[2]})
+            elif 14<=num <=20:
+                self.rooms.update({num:roomtype[3]})
+    
 
 
 class Reservation:
