@@ -8,8 +8,11 @@ class Room:
     Attributes:
         rm_number (str): The room number.
         clean (bool): True if the room is clean, else false.
-                       Set to True by default.
+                      Set to True by default.
         cost (float): The cost of the room.
+        type (str): The type of room (double, king, etc)
+        occupied (bool): True if room is occupied, else False.
+                         Set to False by default.
 
     Args:
         rm_number (str): The room number.
