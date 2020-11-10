@@ -167,32 +167,35 @@ class Reservation:
         """
         pass
 
+
 class Guest:
-    """Represents Guest. 
-    
+    """ Represents Guest. 
+
     Attributes:
         name (str): guests name
         email (str): guests email
         phone_number (str): guests phone number
-        
+
     Args:
         name (str): guests name
         email (str): guests email
         phone_number (str): guests phone number
-    
     """
-    
-    def __init__(self,name, email, phone_number):
+
+    def __init__(self, name, email, phone_number):
         """ Gathers basic information about guest.
-        
+
         This method will ask user to input information about themselves.
-        
+
         Args:
-            name (str)
-            address (str)
-            phone_number (str)
+            name (str): guests name
+            email (str): guests email
+            phone_number (str): guests phone number
+
+        Side Effects:
+            Sets the name, email, and phone_number attributes.
         """
-        
-        self.name = input('\nEnter your name: \n')
-        self.address = input('\nEnter your email: \n')
-        self.phone_number = input('\nEnter your phone number: \n')
+
+        self.name = name
+        self.address = email
+        self.phone_number = phone_number
