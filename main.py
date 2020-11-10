@@ -58,20 +58,20 @@ class Hotel:
             Sets the name, rooms, and tax_perc attribute attributes.
         """
         self.name = name
-        self.rooms = {}
+        self.rooms = list()
         self.tax_perc = tax_perc
 
         room_list = [x for x in range(1, 21)]
         roomtype = ['single', 'double', 'queen', 'king']
         for num in room_list:
             if num <= 5:
-                self.rooms.update({num: roomtype[0]})
+                self.rooms.append(Room(str(num), roomtype[0], True))
             elif 6 <= num <= 10:
-                self.rooms.update({num: roomtype[1]})
+                self.rooms.append(Room(str(num), roomtype[1], False))
             elif 11 <= num <= 15:
-                self.rooms.update({num: roomtype[2]})
+                self.rooms.append(Room(str(num), roomtype[2], False))
             elif 14 <= num <= 20:
-                self.rooms.update({num: roomtype[3]})
+                self.rooms.append(Room(str(num), roomtype[3], False))
 
 
 class Reservation:
