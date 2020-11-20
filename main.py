@@ -35,6 +35,15 @@ class Room:
         self.occupied = False
         self.type = str()
         self.cost = float()
+        
+        if self.type == 'single':
+            self.cost = 90
+        elif self.type == 'double':
+            self.cost = 100
+        elif self.type == 'queen':
+            self.cost = 110
+        elif self.type == 'king':
+            self.cost = 120
 
 
 class Hotel:
@@ -100,9 +109,9 @@ class Reservation:
             Sets the hotel, rooms, guest, check_in_date_time, and the check_out_date_time attributes.
         """
 
-        self.hotel = hotel
+        self.hotel = Hotel()
         self.rooms = rooms
-        self.guest = guest
+        self.guest = Guest()
         self.check_in_date_time = check_in_date_time
         self.check_out_date_time = check_out_date_time
 
