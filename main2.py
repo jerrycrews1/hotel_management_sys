@@ -34,8 +34,8 @@ class Hotel:
 
         self.tax_perc = tax_perc
         
-        self.room_type=Guest.room_type
-        self.num_rooms=Guest.num_rooms
+        self.room_type=guest_obj.room_type
+        self.num_rooms=guest_obj.num_rooms
 
         room_list = [x for x in range(1, 21)]
         roomtype = ['single', 'double', 'queen', 'king']
