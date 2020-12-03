@@ -126,6 +126,7 @@ class Reservation:
     def __str__(self):
         return f"Reservation for {self.guest.name} checking into {self.hotel.name} on {self.check_in_date_time} \
             and checking out on {self.check_out_date_time}"
+    
 
     def check_in(self):
         """ Checks in the guest to the hotel.
@@ -167,7 +168,7 @@ class Reservation:
 
         This method checks if an early checkin has already been given.  It then
         checks to ensure that giving an early checkin doesn't interfere with another
-        reservation's late checkout.
+        reservation.
 
         Args:
             hours(int): The number of hours to subtract from the checkin time.
@@ -179,10 +180,18 @@ class Reservation:
             (datetime): The new checkin time.
         """
         pass
+    
+    def clean_room(self):
+        """ Confirms that a room that was occupied is now clean.
+        
+        Side Effects:
+            Changes the room object's clean attribute to True.
+        """
+        pass
 
 
 class Guest:
-    """ Represents Guest. 
+    """ Represents a Guest. 
 
     Attributes:
         name (str): guests name
