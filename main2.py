@@ -7,6 +7,8 @@ from argparse import ArgumentParser
 import sys
 import datetime
 
+roomtype = ['single', 'double', 'queen', 'king']
+
 class Hotel:
     """ Represents the hotel that will be managed.
 
@@ -33,7 +35,7 @@ class Hotel:
         self.tax_perc = tax_perc
 
         room_list = [x for x in range(1, 21)]
-        roomtype = ['single', 'double', 'queen', 'king']
+        
         rooms_dict = {}
 
         for num in room_list:
@@ -60,7 +62,7 @@ class Guest:
         phone_number (str): guests phone number
     """
 
-    def init(self, name, phone_number, num_rooms, room_type, check_in, check_out):
+    def __init__(self, name, phone_number, num_rooms, room_type, check_in, check_out):
         """ Gathers basic information about guest, the room type they want and their check in and check out dates.
 
         Args:
@@ -85,21 +87,28 @@ class Guest:
 def main(hn, tp):
 
     hotel_obj = Hotel(hn,tp)
-    print(hotel_obj.tax_perc)
-    # x = input("what's up")
-    # print(x)
-    # [Guest name,[{0:single, 1:queen}]]
+ 
+    name = input("Enter the guest's name: ")
+    phone_number = input("Enter the guest's phone_number: ")
+    num_rooms = int(input("Enter how many rooms the guest needs: "))
+    room_type = input("Enter the type of room the guest wants: (king, queen, double, single) ")
+    check_in = datetime.date.today()
+    days_staying = int(input("Enter how many days the guest be staying: " ))
     
+    check_out = (check_in + datetime.timedelta(days=days_staying))
+    
+    guest_obj = Guest(name, phone_number, num_rooms, room_type, check_in, check_out)
+    print(guest_obj.check_in)
 def parse_args(arglist):
     parser = ArgumentParser()
     parser.add_argument("-hn", "--hotel_name", default='Random Hotel', type=str, help="The name of the hotel")
     parser.add_argument("-tp", "--tax_perc", default =.1, type=float, help="The amount of tax the hotel charges per transaction" )
-    parser.add_argument("-n", "--name", type = str, help = "Enter your name")
-    parser.add_argument("p", "--phone_number", type = str, help = "guests phone number")
-    parser.add_argument("nr", "--num_rooms",type = int, help = "number of rooms you want to reserve")
-    parser.add_argument("rt","--room_type", type = str, help = "room types: single, double, queen, king")
-    parser.add_argument("ci", "-- check_in", type = datetime, help = "enter check in date in 'YYYY/MM/DD' format")
-    parser.add_argument("co", "--check_out", type = datetime, help = "enter check out date in 'YYYY/MM/DD' format")
+    # parser.add_argument("-n", "--name", type = str, help = "Enter your name")
+    # parser.add_argument("-p", "--phone_number", type = str, help = "guests phone number")
+    # parser.add_argument("-nr", "--num_rooms",type = int, help = "number of rooms you want to reserve")
+    # parser.add_argument("-rt","--room_type", type = str, help = "room types: single, double, queen, king")
+    # parser.add_argument("-ci", "--check_in", help = "enter check in date in 'YYYY/MM/DD' format")
+    # parser.add_argument("-co", "--check_out", help = "enter check out date in 'YYYY/MM/DD' format")
     args = parser.parse_args(arglist)
     
     return args
