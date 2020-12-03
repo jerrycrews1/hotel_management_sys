@@ -76,17 +76,17 @@ class Hotel:
         If too many rooms are attempting to be booked the method tells the user that there aren't enough rooms available.
         """
         possible_rooms=[]
+        x=0
         for key, value in self.rooms_dict.items():
             if self.room_type == value: 
                 possible_rooms.append(key)
         if len(possible_rooms)<self.num_rooms:
             return "Not enough rooms are available."
         else:
-            for rooms in self.num_rooms:
-                x=0
+            while x<self.num_rooms-1:
                 self.occupied_rooms[possible_rooms[x]]=self.rooms_dict.pop(possible_rooms[x])
                 x=x+1
-                print("Room "+possible_rooms[x]+" is now booked.")
+                print("Room "+str(possible_rooms[x])+" is now booked.")
                 
 class Guest:
     """ Represents a Guest. 
@@ -139,7 +139,10 @@ def main(hn, tp):
     guest_obj = Guest(name, phone_number, num_rooms, room_type, days_staying, check_in, check_out)
     hotel_obj = Hotel(hn,tp, guest_obj)
     total_cost=hotel_obj.t_cost()
+    rooms_booked=hotel_obj.occupied()
     print(f"{guest_obj.name}'s total cost is ${total_cost:.2f}")
+    rooms_booked
+    
     
 def parse_args(arglist):
     parser = ArgumentParser()
