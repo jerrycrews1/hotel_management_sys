@@ -24,26 +24,27 @@ class Hotel:
         Args:
             name (str): The name of the hotel.
             tax_perc (float): The tax percentage the hotel is subject to.
-            rooms (list of objs): The rooms belonging to the hotel.
 
         Side Effects:
-            Sets the name, rooms, and tax_perc attribute attributes.
+            Sets the name, and tax_perc attribute attributes.
         """
         self.name = name
-        rooms = list()
+
         self.tax_perc = tax_perc
 
         room_list = [x for x in range(1, 21)]
         roomtype = ['single', 'double', 'queen', 'king']
+        rooms_dict = {}
+
         for num in room_list:
             if num <= 5:
-                rooms.append(Room(str(num), roomtype[0], True))
+                rooms_dict[num] = roomtype[0]
             elif 6 <= num <= 10:
-                rooms.append(Room(str(num), roomtype[1], False))
+                rooms_dict[num] = roomtype[1]
             elif 11 <= num <= 15:
-                rooms.append(Room(str(num), roomtype[2], False))
+                rooms_dict[num] = roomtype[2]
             elif 14 <= num <= 20:
-                rooms.append(Room(str(num), roomtype[3], False))
+                rooms_dict[num] = roomtype[3]
                 
 class Guest:
     """ Represents a Guest. 
