@@ -7,7 +7,6 @@ from argparse import ArgumentParser
 import sys
 import datetime
 
-roomtype = ['single', 'double', 'queen', 'king']
 
 class Hotel:
     """ Represents the hotel that will be managed.
@@ -29,14 +28,16 @@ class Hotel:
         Side Effects:
             Sets the name, and tax_perc attribute attributes.
         """
-        print(guest_obj.name)
-        self.name = name
 
+        self.name = name
         self.tax_perc = tax_perc
         
-        self.room_type=Guest.room_type
-        self.num_rooms=Guest.num_rooms
-
+        
+        self.room_type=guest_obj.room_type
+        self.num_rooms=guest_obj.num_rooms
+        self.guest_obj=guest_obj
+        
+        
         room_list = [x for x in range(1, 21)]
         roomtype = ['single', 'double', 'queen', 'king']
         self.rooms_dict = {}
@@ -51,6 +52,24 @@ class Hotel:
                 self.rooms_dict[num] = roomtype[2]
             elif 14 <= num <= 20:
                 self.rooms_dict[num] = roomtype[3]
+                
+    def t_cost(self):
+        """ This method calculates the total cost per reservation
+        Return:
+            cost(float): The total cost, including tax
+        """
+        
+        if self.guest_obj.room_type == 'single':
+            cost = (90*self.guest_obj.num_rooms) * self.guest_obj.days_staying  #+ ((90*self.guest_obj.num_rooms)*self.tax_perc)
+        elif self.guest_obj.room_type == 'double':
+            cost = (100*self.guest_obj.num_rooms) * self.guest_obj.days_staying #+ ((100*self.guest_obj.num_rooms)*self.tax_perc)
+        elif self.guest_obj.room_type == 'queen':
+            cost = (110*self.guest_obj.num_rooms) * self.guest_obj.days_staying #+ ((110*self.guest_obj.num_rooms)*self.tax_perc)
+        elif self.guest_obj.room_type == 'king':
+            cost = (120*self.guest_obj.num_rooms) * self.guest_obj.days_staying #+ ((120*self.guest_obj.num_rooms)*self.tax_perc)
+        cost = cost + (cost*self.tax_perc)
+        return cost
+        
     def occupied(self):
         """
         Uses room type and number of rooms specified by guests to mark rooms as occupied and remove them from the available rooms to choose from.
@@ -82,7 +101,7 @@ class Guest:
         phone_number (str): guests phone number
     """
 
-    def __init__(self, name, phone_number, num_rooms, room_type, check_in, check_out):
+    def __init__(self, name, phone_number, num_rooms, room_type, days_staying, check_in, check_out):
         """ Gathers basic information about guest, the room type they want and their check in and check out dates.
 
         Args:
@@ -101,23 +120,26 @@ class Guest:
         self.phone_number = phone_number
         self.num_rooms = num_rooms
         self.room_type = room_type
+        self.days_staying = days_staying
         self.check_in = check_in
         self.check_out = check_out
         
 def main(hn, tp):
  
-    name = input("Enter the guest's name: ")
+    name = input("Enter the guest's name: ").capitalize()
     phone_number = input("Enter the guest's phone_number: ")
     num_rooms = int(input("Enter how many rooms the guest needs: "))
-    room_type = input("Enter the type of room the guest wants: (king, queen, double, single) ")
+    room_type = input("Enter the type of room the guest wants (king, queen, double, single): ").casefold()
     check_in = datetime.date.today()
     days_staying = int(input("Enter how many days the guest be staying: " ))
     
     check_out = (check_in + datetime.timedelta(days=days_staying))
     
-    guest_obj = Guest(name, phone_number, num_rooms, room_type, check_in, check_out)
+    guest_obj = Guest(name, phone_number, num_rooms, room_type, days_staying, check_in, check_out)
     hotel_obj = Hotel(hn,tp, guest_obj)
-
+    total_cost=hotel_obj.t_cost()
+    print(f"{guest_obj.name}'s total cost is ${total_cost:.2f}")
+    
 def parse_args(arglist):
     parser = ArgumentParser()
     parser.add_argument("-hn", "--hotel_name", default='Random Hotel', type=str, help="The name of the hotel")
