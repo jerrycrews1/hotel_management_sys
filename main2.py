@@ -16,7 +16,7 @@ class Hotel(Guest):
         
     """
 
-    def __init__(self, name, tax_perc): # I, Samson, removed the attribute 'rooms' for the parse args func to work. 
+    def __init__(self, name, tax_perc, Guest): # I, Samson, removed the attribute 'rooms' for the parse args func to work. 
                                         # I could add another argument in the parse func instead, but I am not sure if that is necessary. If it is we can do so.
 
         """ Initializes a Hotel object.
@@ -105,9 +105,9 @@ class Guest:
         self.check_in = check_in
         self.check_out = check_out
         
-def main(hn, tp):
+def main(hn, tp, Guest):
 
-    hotel_obj = Hotel(hn,tp)
+    hotel_obj = Hotel(hn,tp,Guest)
     print(hotel_obj.tax_perc)
     # x = input("what's up")
     # print(x)
@@ -129,4 +129,4 @@ def parse_args(arglist):
 
 if __name__ == "__main__":
     args = parse_args(sys.argv[1:])
-    main(hn=args.hotel_name, tp = args.tax_perc)
+    main(hn=args.hotel_name, tp = args.tax_perc, Guest=args.Guest)
