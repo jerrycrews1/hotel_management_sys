@@ -3,6 +3,8 @@
 This module allows a hotel receptionist or manager to perform various functions
 necessary for operating a hotel.
 """
+from argparse import ArgumentParser
+import sys
 
 
 class Room:
@@ -55,7 +57,9 @@ class Hotel:
         rooms (list of objs): The rooms belonging to the hotel.
     """
 
-    def __init__(self, name, tax_perc, rooms):
+    def __init__(self, name, tax_perc): # I, Samson, removed the attribute 'rooms' for the parse args func to work. 
+                                        # I could add another argument in the parse func instead, but I am not sure if that is necessary. If it is we can do so.
+
         """ Initializes a Hotel object.
 
         Args:
@@ -67,20 +71,20 @@ class Hotel:
             Sets the name, rooms, and tax_perc attribute attributes.
         """
         self.name = name
-        self.rooms = list()
+        rooms = list()
         self.tax_perc = tax_perc
 
         room_list = [x for x in range(1, 21)]
         roomtype = ['single', 'double', 'queen', 'king']
         for num in room_list:
             if num <= 5:
-                self.rooms.append(Room(str(num), roomtype[0], True))
+                rooms.append(Room(str(num), roomtype[0], True))
             elif 6 <= num <= 10:
-                self.rooms.append(Room(str(num), roomtype[1], False))
+                rooms.append(Room(str(num), roomtype[1], False))
             elif 11 <= num <= 15:
-                self.rooms.append(Room(str(num), roomtype[2], False))
+                rooms.append(Room(str(num), roomtype[2], False))
             elif 14 <= num <= 20:
-                self.rooms.append(Room(str(num), roomtype[3], False))
+                rooms.append(Room(str(num), roomtype[3], False))
 
 
 class Reservation:
@@ -208,3 +212,21 @@ class Guest:
         self.name = name
         self.address = email
         self.phone_number = phone_number
+        
+def main(hn, tp):
+
+    hotel_obj = Hotel(hn,tp)
+    print(hotel_obj.tax_perc)
+    
+    
+def parse_args(arglist):
+    parser = ArgumentParser()
+    parser.add_argument("-hn", "--hotel_name", default='Random Hotel', type=str, help="The name of the hotel")
+    parser.add_argument("-tp", "--tax_perc", default =.1, type=float, help="The amount of tax the hotel charges per transaction" )
+    args = parser.parse_args(arglist)
+    
+    return args
+
+if __name__ == "__main__":
+    args = parse_args(sys.argv[1:])
+    main(hn=args.hotel_name, tp = args.tax_perc)
