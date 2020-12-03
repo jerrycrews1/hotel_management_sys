@@ -54,7 +54,7 @@ class Hotel:
     Attributes:
         name (str): The name of the hotel.
         tax_perc (float): The tax percentage the hotel is subject to.
-        rooms (list of objs): The rooms belonging to the hotel.
+        
     """
 
     def __init__(self, name, tax_perc): # I, Samson, removed the attribute 'rooms' for the parse args func to work. 
