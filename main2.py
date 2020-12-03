@@ -18,8 +18,7 @@ class Hotel:
         
     """
 
-    def __init__(self, name, tax_perc): # I, Samson, removed the attribute 'rooms' for the parse args func to work. 
-                                        # I could add another argument in the parse func instead, but I am not sure if that is necessary. If it is we can do so.
+    def __init__(self, name, tax_perc, guest_obj): 
 
         """ Initializes a Hotel object.
 
@@ -30,23 +29,44 @@ class Hotel:
         Side Effects:
             Sets the name, and tax_perc attribute attributes.
         """
+        print(guest_obj.name)
         self.name = name
 
         self.tax_perc = tax_perc
+        
+        self.room_type=Guest.room_type
+        self.num_rooms=Guest.num_rooms
 
         room_list = [x for x in range(1, 21)]
-        
-        rooms_dict = {}
+        roomtype = ['single', 'double', 'queen', 'king']
+        self.rooms_dict = {}
+        self.occupied_rooms={}
 
         for num in room_list:
             if num <= 5:
-                rooms_dict[num] = roomtype[0]
+                self.rooms_dict[num] = roomtype[0]
             elif 6 <= num <= 10:
-                rooms_dict[num] = roomtype[1]
+                self.rooms_dict[num] = roomtype[1]
             elif 11 <= num <= 15:
-                rooms_dict[num] = roomtype[2]
+                self.rooms_dict[num] = roomtype[2]
             elif 14 <= num <= 20:
-                rooms_dict[num] = roomtype[3]
+                self.rooms_dict[num] = roomtype[3]
+    def occupied(self):
+        """
+        Uses room type and number of rooms specified by guests to mark rooms as occupied and remove them from the available rooms to choose from.
+        If too many rooms are attempting to be booked the method tells the user that there aren't enough rooms available.
+        """
+        possible_rooms=[]
+        for key, value in self.rooms_dict.items():
+            if self.room_type == value: 
+                possible_rooms.append(key)
+        if len(possible_rooms)<self.num_rooms:
+            return "Not enough rooms are available."
+        else:
+            for rooms in self.num_rooms:
+                x=0
+                self.occupied_rooms[possible_rooms[x]]=self.rooms_dict.pop(possible_rooms[x])
+                x=x+1
                 
 class Guest:
     """ Represents a Guest. 
@@ -85,8 +105,6 @@ class Guest:
         self.check_out = check_out
         
 def main(hn, tp):
-
-    hotel_obj = Hotel(hn,tp)
  
     name = input("Enter the guest's name: ")
     phone_number = input("Enter the guest's phone_number: ")
@@ -98,7 +116,8 @@ def main(hn, tp):
     check_out = (check_in + datetime.timedelta(days=days_staying))
     
     guest_obj = Guest(name, phone_number, num_rooms, room_type, check_in, check_out)
-    print(guest_obj.check_in)
+    hotel_obj = Hotel(hn,tp, guest_obj)
+
 def parse_args(arglist):
     parser = ArgumentParser()
     parser.add_argument("-hn", "--hotel_name", default='Random Hotel', type=str, help="The name of the hotel")
