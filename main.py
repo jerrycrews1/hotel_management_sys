@@ -85,11 +85,9 @@ class Hotel:
                 rooms.append(Room(str(num), roomtype[2], False))
             elif 14 <= num <= 20:
                 rooms.append(Room(str(num), roomtype[3], False))
-
-
+            
 class Reservation:
     """ Represents a hotel reservation.
-
     Attributes:
         hotel (obj): A hotel object.
         rooms (list of objs): List of room objects.
@@ -226,7 +224,9 @@ def main(hn, tp):
 
     hotel_obj = Hotel(hn,tp)
     print(hotel_obj.tax_perc)
-    
+    # x = input("what's up")
+    # print(x)
+    # [Guest name,[{0:single, 1:queen}]]
     
 def parse_args(arglist):
     parser = ArgumentParser()
