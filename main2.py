@@ -7,7 +7,7 @@ from argparse import ArgumentParser
 import sys
 import datetime
 
-class Hotel:
+class Hotel(Guest):
     """ Represents the hotel that will be managed.
 
     Attributes:
@@ -31,20 +31,43 @@ class Hotel:
         self.name = name
 
         self.tax_perc = tax_perc
+        
+        self.room_type=Guest.room_type
+        self.num_rooms=Guest.num_rooms
 
         room_list = [x for x in range(1, 21)]
         roomtype = ['single', 'double', 'queen', 'king']
-        rooms_dict = {}
+        self.rooms_dict = {}
+        self.occupied_rooms={}
 
         for num in room_list:
             if num <= 5:
-                rooms_dict[num] = roomtype[0]
+                self.rooms_dict[num] = roomtype[0]
             elif 6 <= num <= 10:
-                rooms_dict[num] = roomtype[1]
+                self.rooms_dict[num] = roomtype[1]
             elif 11 <= num <= 15:
-                rooms_dict[num] = roomtype[2]
+                self.rooms_dict[num] = roomtype[2]
             elif 14 <= num <= 20:
-                rooms_dict[num] = roomtype[3]
+                self.rooms_dict[num] = roomtype[3]
+    def occupied(self):
+        """
+        Uses room type and number of rooms specified by guests to mark rooms as occupied and remove them from the available rooms to choose from.
+        If too many rooms are attempting to be booked the method tells the user that there aren't enough rooms available.
+        """
+        possible_rooms=[]
+        for key, value in self.rooms_dict.items():
+            if self.room_type == value: 
+                possible_rooms.append(key)
+        if len(possible_rooms)<self.num_rooms:
+            return "Not enough rooms are available."
+        else:
+            for rooms in self.num_rooms:
+                x=0
+                self.occupied_rooms[possible_rooms[x]]=self.rooms_dict.pop(possible_rooms[x])
+                x=x+1
+        
+        
+        
                 
 class Guest:
     """ Represents a Guest. 
