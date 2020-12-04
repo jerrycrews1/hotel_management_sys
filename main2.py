@@ -83,7 +83,7 @@ class Hotel:
         if len(possible_rooms)<self.num_rooms:
             return "Not enough rooms are available."
         else:
-            while x<self.num_rooms-1:
+            while x<self.num_rooms:
                 self.occupied_rooms[possible_rooms[x]]=self.rooms_dict.pop(possible_rooms[x])
                 x=x+1
                 print("Room "+str(possible_rooms[x])+" is now booked.")
