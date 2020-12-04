@@ -14,6 +14,11 @@ class Hotel:
     Attributes:
         name (str): The name of the hotel.
         tax_perc (float): The tax percentage the hotel is subject to.
+        room_type (str): The type of room the guest has requested
+        num_rooms (int): The number of rooms the guest has requested
+        guest_obj (obj): An object of the Guest class
+        rooms_dict (dict): A dictionary where the key is the room number and the value is the room type
+        occupied_rooms (dict): A dictionary with rooms that are currently occupied
         
     """
 
@@ -24,6 +29,7 @@ class Hotel:
         Args:
             name (str): The name of the hotel.
             tax_perc (float): The tax percentage the hotel is subject to.
+            guest_obj (obj): An object of the Guest class
 
         Side Effects:
             Sets the name, and tax_perc attribute attributes.
@@ -31,8 +37,6 @@ class Hotel:
 
         self.name = name
         self.tax_perc = tax_perc
-        
-        
         self.room_type=guest_obj.room_type
         self.num_rooms=guest_obj.num_rooms
         self.guest_obj=guest_obj
@@ -100,27 +104,18 @@ class Guest:
         days_staying (int): number of days guest wants to stay
         check_in (datetime): date guest checks in
         check_out (datetime): date guest checks out
-
-    Args:
-        name (str): guests name
-        phone_number (str): guests phone number
-        num_rooms (int): number of rooms guest wants to book
-        room_type (str): king, queen, double, single
-        days_staying (int): number of days guest wants to stay
-        check_in (datetime): date guest checks in
-        check_out (datetime): date guest checks out
     """
 
     def __init__(self, name, phone_number, num_rooms, room_type, days_staying, check_in, check_out):
         """ Gathers basic information about guest, the room type they want and their check in and check out dates.
-
         Args:
             name (str): guests name
             phone_number (str): guests phone number
-            num_rooms (int): number of rooms guest wants to reserve
-            room_type (str): room type (single, double, queen, king)
+            num_rooms (int): number of rooms guest wants to book
+            room_type (str): king, queen, double, single
+            days_staying (int): number of days guest wants to stay
             check_in (datetime): date guest checks in
-            check_out (datetime): date guest wants to check out
+            check_out (datetime): date guest checks out
 
         Side Effects:
             Sets the name, phone_number, num_rooms, room_type, check_in, check_out attributes.
