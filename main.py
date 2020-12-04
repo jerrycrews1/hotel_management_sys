@@ -3,6 +3,8 @@
 This module allows a hotel receptionist or manager to perform various functions
 necessary for operating a hotel.
 """
+from argparse import ArgumentParser
+import sys
 
 import sqlite3
 
@@ -37,6 +39,15 @@ class Room:
         self.occupied = False
         self.type = str()
         self.cost = float()
+        
+        if self.type == 'single':
+            self.cost = 90
+        elif self.type == 'double':
+            self.cost = 100
+        elif self.type == 'queen':
+            self.cost = 110
+        elif self.type == 'king':
+            self.cost = 120
 
 
 class Hotel:
@@ -45,10 +56,16 @@ class Hotel:
     Attributes:
         name (str): The name of the hotel.
         tax_perc (float): The tax percentage the hotel is subject to.
-        rooms (list of objs): The rooms belonging to the hotel.
+        
     """
 
+<<<<<<< HEAD
     def __init__(self, name, tax_perc):
+=======
+    def __init__(self, name, tax_perc): # I, Samson, removed the attribute 'rooms' for the parse args func to work. 
+                                        # I could add another argument in the parse func instead, but I am not sure if that is necessary. If it is we can do so.
+
+>>>>>>> 105f3776f4838f58309dd1f2672878a9ac24c477
         """ Initializes a Hotel object.
 
         Args:
@@ -59,25 +76,23 @@ class Hotel:
             Sets the name, rooms, and tax_perc attribute attributes.
         """
         self.name = name
-        self.rooms = list()
+        rooms = list()
         self.tax_perc = tax_perc
 
         room_list = [x for x in range(1, 21)]
         roomtype = ['single', 'double', 'queen', 'king']
         for num in room_list:
             if num <= 5:
-                self.rooms.append(Room(str(num), roomtype[0], True))
+                rooms.append(Room(str(num), roomtype[0], True))
             elif 6 <= num <= 10:
-                self.rooms.append(Room(str(num), roomtype[1], False))
+                rooms.append(Room(str(num), roomtype[1], False))
             elif 11 <= num <= 15:
-                self.rooms.append(Room(str(num), roomtype[2], False))
+                rooms.append(Room(str(num), roomtype[2], False))
             elif 14 <= num <= 20:
-                self.rooms.append(Room(str(num), roomtype[3], False))
-
-
+                rooms.append(Room(str(num), roomtype[3], False))
+            
 class Reservation:
     """ Represents a hotel reservation.
-
     Attributes:
         hotel (obj): A hotel object.
         rooms (list of objs): List of room objects.
@@ -103,9 +118,9 @@ class Reservation:
             and connects to the reservation's table in the sqlite database.
         """
 
-        self.hotel = hotel
+        self.hotel = Hotel()
         self.rooms = rooms
-        self.guest = guest
+        self.guest = Guest()
         self.check_in_date_time = check_in_date_time
         self.check_out_date_time = check_out_date_time
 
@@ -116,6 +131,7 @@ class Reservation:
     def __str__(self):
         return f"Reservation for {self.guest.name} checking into {self.hotel.name} on {self.check_in_date_time} \
             and checking out on {self.check_out_date_time}"
+    
 
     def check_in(self):
         """ Checks in the guest to the hotel.
@@ -157,7 +173,7 @@ class Reservation:
 
         This method checks if an early checkin has already been given.  It then
         checks to ensure that giving an early checkin doesn't interfere with another
-        reservation's late checkout.
+        reservation.
 
         Args:
             hours(int): The number of hours to subtract from the checkin time.
@@ -169,10 +185,18 @@ class Reservation:
             (datetime): The new checkin time.
         """
         pass
+    
+    def clean_room(self):
+        """ Confirms that a room that was occupied is now clean.
+        
+        Side Effects:
+            Changes the room object's clean attribute to True.
+        """
+        pass
 
 
 class Guest:
-    """ Represents Guest. 
+    """ Represents a Guest. 
 
     Attributes:
         name (str): guests name
@@ -202,4 +226,23 @@ class Guest:
         self.name = name
         self.address = email
         self.phone_number = phone_number
+        
+def main(hn, tp):
 
+    hotel_obj = Hotel(hn,tp)
+    print(hotel_obj.tax_perc)
+    # x = input("what's up")
+    # print(x)
+    # [Guest name,[{0:single, 1:queen}]]
+    
+def parse_args(arglist):
+    parser = ArgumentParser()
+    parser.add_argument("-hn", "--hotel_name", default='Random Hotel', type=str, help="The name of the hotel")
+    parser.add_argument("-tp", "--tax_perc", default =.1, type=float, help="The amount of tax the hotel charges per transaction" )
+    args = parser.parse_args(arglist)
+    
+    return args
+
+if __name__ == "__main__":
+    args = parse_args(sys.argv[1:])
+    main(hn=args.hotel_name, tp = args.tax_perc)
