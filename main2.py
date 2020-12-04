@@ -85,8 +85,8 @@ class Hotel:
         else:
             while x<self.num_rooms:
                 self.occupied_rooms[possible_rooms[x]]=self.rooms_dict.pop(possible_rooms[x])
-                x=x+1
                 print("Room "+str(possible_rooms[x])+" is now booked.")
+                x=x+1
                 
 class Guest:
     """ Represents a Guest. 
