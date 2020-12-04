@@ -133,7 +133,7 @@ def main(hn, tp):
  
     name = input("Enter the guest's name: ").capitalize()
     phone_number = input("Enter the guest's phone_number: ")
-    num_rooms = int(input("Enter how many rooms the guest needs: "))
+    num_rooms = int(input("Enter how many rooms the guest needs (no more than 5): "))
     room_type = input("Enter the type of room the guest wants (king, queen, double, single): ").casefold()
     check_in = datetime.date.today()
     days_staying = int(input("Enter how many days the guest be staying: " ))
