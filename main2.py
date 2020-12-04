@@ -78,6 +78,10 @@ class Hotel:
         """
         Uses room type and number of rooms specified by guests to mark rooms as occupied and remove them from the available rooms to choose from.
         If too many rooms are attempting to be booked the method tells the user that there aren't enough rooms available.
+        
+        Return:
+            possible_rooms (list): a list of available rooms
+        
         """
         possible_rooms=[]
         x=0
