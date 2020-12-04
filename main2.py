@@ -94,13 +94,21 @@ class Guest:
 
     Attributes:
         name (str): guests name
-        email (str): guests email
         phone_number (str): guests phone number
+        num_rooms (int): number of rooms guest wants to book
+        room_type (str): king, queen, double, single
+        days_staying (int): number of days guest wants to stay
+        check_in (datetime): date guest checks in
+        check_out (datetime): date guest checks out
 
     Args:
         name (str): guests name
-        email (str): guests email
         phone_number (str): guests phone number
+        num_rooms (int): number of rooms guest wants to book
+        room_type (str): king, queen, double, single
+        days_staying (int): number of days guest wants to stay
+        check_in (datetime): date guest checks in
+        check_out (datetime): date guest checks out
     """
 
     def __init__(self, name, phone_number, num_rooms, room_type, days_staying, check_in, check_out):
