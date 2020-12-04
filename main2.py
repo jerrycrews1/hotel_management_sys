@@ -68,7 +68,7 @@ class Hotel:
         elif self.guest_obj.room_type == 'king':
             cost = (120*self.guest_obj.num_rooms) * self.guest_obj.days_staying #+ ((120*self.guest_obj.num_rooms)*self.tax_perc)
         cost = cost + (cost*self.tax_perc)
-        return cost
+        print(f"{self.guest_obj.name}'s total cost is ${cost:.2f}")
         
     def occupied(self):
         """
@@ -86,7 +86,11 @@ class Hotel:
             while x<self.num_rooms:
                 self.occupied_rooms[possible_rooms[x]]=self.rooms_dict.pop(possible_rooms[x])
                 print("Room "+str(possible_rooms[x])+" is now booked.")
+<<<<<<< HEAD
                 x=x+1
+=======
+        return possible_rooms
+>>>>>>> f67a00caf2ce028f897678e98d9211045104232c
                 
 class Guest:
     """ Represents a Guest. 
@@ -140,8 +144,8 @@ def main(hn, tp):
     hotel_obj = Hotel(hn,tp, guest_obj)
     total_cost=hotel_obj.t_cost()
     rooms_booked=hotel_obj.occupied()
-    print(f"{guest_obj.name}'s total cost is ${total_cost:.2f}")
-    rooms_booked
+    
+    
     
     
 def parse_args(arglist):
