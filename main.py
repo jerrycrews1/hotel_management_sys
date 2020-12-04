@@ -4,6 +4,8 @@ This module allows a hotel receptionist or manager to perform various functions
 necessary for operating a hotel.
 """
 
+import sqlite3
+
 
 class Room:
     """ Represents a room.
@@ -46,13 +48,12 @@ class Hotel:
         rooms (list of objs): The rooms belonging to the hotel.
     """
 
-    def __init__(self, name, tax_perc, rooms):
+    def __init__(self, name, tax_perc):
         """ Initializes a Hotel object.
 
         Args:
             name (str): The name of the hotel.
             tax_perc (float): The tax percentage the hotel is subject to.
-            rooms (list of objs): The rooms belonging to the hotel.
 
         Side Effects:
             Sets the name, rooms, and tax_perc attribute attributes.
@@ -95,9 +96,11 @@ class Reservation:
             guest (obj): The guest who is making the reservation.
             check_in_date_time (datetime): The date the guest will check in.
             check_out_date_time (datetime): The date the guest will check out.
+            conn (obj): A connection object of a sqlite db.
 
         Side Effects:
-            Sets the hotel, rooms, guest, check_in_date_time, and the check_out_date_time attributes.
+            Sets the hotel, rooms, guest, check_in_date_time, and the check_out_date_time attributes
+            and connects to the reservation's table in the sqlite database.
         """
 
         self.hotel = hotel
@@ -199,3 +202,4 @@ class Guest:
         self.name = name
         self.address = email
         self.phone_number = phone_number
+
