@@ -231,10 +231,18 @@ def main(hn, tp):
     
 def parse_args(arglist):
     parser = ArgumentParser()
-    parser.add_argument("-hn", "--hotel_name", default='Random Hotel', type=str, help="The name of the hotel")
-    parser.add_argument("-tp", "--tax_perc", default =.1, type=float, help="The amount of tax the hotel charges per transaction" )
+    parser.add_argument("-hn", "--hotel_name", default='Random Hotel',
+                        type=str, help="The name of the hotel")
+    parser.add_argument("-tp", "--tax_perc", default=.1, type=float,
+                        help="The amount of tax the hotel charges per transaction")
+    # parser.add_argument("-n", "--name", type = str, help = "Enter your name")
+    # parser.add_argument("-p", "--phone_number", type = str, help = "guests phone number")
+    # parser.add_argument("-nr", "--num_rooms",type = int, help = "number of rooms you want to reserve")
+    # parser.add_argument("-rt","--room_type", type = str, help = "room types: single, double, queen, king")
+    # parser.add_argument("-ci", "--check_in", help = "enter check in date in 'YYYY/MM/DD' format")
+    # parser.add_argument("-co", "--check_out", help = "enter check out date in 'YYYY/MM/DD' format")
     args = parser.parse_args(arglist)
-    
+
     return args
 
 if __name__ == "__main__":

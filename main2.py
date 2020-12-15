@@ -9,37 +9,64 @@ import datetime
 import sqlite3
 
 
+class Room:
+    """ Represents a room.
+
+    Attributes:
+        rm_number (str): The room number.
+        availability (int): 1 if the room is clean, else 2.
+                      Set to 1 by default.
+        rate (float): The cost of the room.
+    """
+
+    def __init__(self, rm_number):
+        """ Initializes a Room object from the rooms table in the db.
+
+        Args:
+            room_number (int): The room number.
+
+        Side Effects:
+            Sets the room_number, availability, room_type_id, and rate attributes.
+        """
+        conn = sqlite3.connect('hotel.db')
+        c = conn.cursor()
+
+        c.execute('SELECT * FROM rooms WHERE room_number = ?', (room_number, ))
+        room = c.fetchone()
+
+        self.room_number = room[0]
+        self.room_type_id = room[1]
+        self.rate = room[2]
+        self.availability = room[3]
+
+
 class Hotel:
     """ Represents the hotel that will be managed.
 
     Attributes:
-        name (str): The name of the hotel.
+        hotel_id (int): The hotel id.
+        hotel_name (str): The name of the hotel.
         tax_perc (float): The tax percentage the hotel is subject to.
-        room_type (str): The type of room the guest has requested
-        num_rooms (int): The number of rooms the guest has requested
-        guest_obj (obj): An object of the Guest class
-        rooms_dict (dict): A dictionary where the key is the room number and the value is the room type
-        occupied_rooms (dict): A dictionary with rooms that are currently occupied
-
     """
 
-    def __init__(self, name, tax_perc, guest_obj):
+    def __init__(self, hotel_id):
         """ Initializes a Hotel object.
 
         Args:
-            name (str): The name of the hotel.
-            tax_perc (float): The tax percentage the hotel is subject to.
-            guest_obj (obj): An object of the Guest class
+            hotel_id (int): The hotel id.
 
         Side Effects:
-            Sets the name, and tax_perc attribute attributes.
+            Sets the name and tax_perc attribute attributes.
         """
+        conn = sqlite3.connect('hotel.db')
+        c = conn.cursor()
+        c.execute('SELECT * FROM hotels WHERE hotel_id = ?',
+                  (hotel_id, ))
+        hotel = c.fetchone()
 
-        self.name = name
-        self.tax_perc = tax_perc
-        self.room_type = guest_obj.room_type
-        self.num_rooms = guest_obj.num_rooms
-        self.guest_obj = guest_obj
+        self.hotel_id = hotel[0]
+        self.name = hotel[1]
+        self.tax_perc = hotel[2]
 
         room_list = [x for x in range(1, 21)]
         roomtype = ['single', 'double', 'queen', 'king']
@@ -103,62 +130,84 @@ class Hotel:
 
 
 class Guest:
-    """ Represents a Guest. 
+    """ Represents a Guest from the db. 
 
     Attributes:
-        guest_id (int): The guest_id stored in the db.
+        phone_number (str): The guest's phone number.
+        name (str): The guests' name.
     """
 
-    def __init__(self, guest_id):
+    def __init__(self, phone_number):
         """ Gathers basic information about guest, the room type they want and their check in and check out dates.
         Args:
-            guest_id (int): The guest_id stored in the db.
-
+            phone_number (str): The guest's phone number.
         Side Effects:
             Sets the name, phone_number, num_rooms, room_type, check_in, check_out attributes.
         """
-        self.guest_id = guest_id
-        conn = sqlite3.connect('hotel.db')
-        c = conn.cursor()
-        guest = c.execute(
-            f'''SELECT * FROM guests WHERE guest_id = {guest_id}''').fetchall()[0]
 
-        self.name = guest[1]
-        self.phone_number = guest[2]
-        self.num_rooms = guest[3]
-        self.room_type = guest[4]
-        self.days_staying = guest[5]
-        self.check_in = guest[6]
-        self.check_out = guest[7]
+        self.conn = sqlite3.connect('hotel.db')
+        c = self.conn.cursor()
+        c.execute('SELECT * FROM guests WHERE phone_number = ?',
+                  (phone_number, ))
+        guest = c.fetchone()
+
+        self.guest_id = guest[0]
+        self.name = guest[2]
+        self.phone_number = guest[1]
+
+    def edit_phone_number(self, new_number):
+        self.phone_number = new_number
+        c = self.conn.cursor()
+        c.execute('UPDATE guests SET phone_number = ? WHERE guest_id = ?',
+                  (self.phone_number, self.guest_id))
+        self.conn.commit()
+
+    def edit_name(self, new_name):
+        self.name = new_name
+        c = self.conn.cursor()
+        c.execute('UPDATE guests SET new_name = ? WHERE guest_id = ?',
+                  (self.name, self.guest_id))
+        self.conn.commit()
 
 
 def create_guest():
     name = input("Enter the guest's name: ").capitalize()
     phone_number = input("Enter the guest's phone_number: ")
-    num_rooms = int(
-        input("Enter how many rooms the guest needs (no more than 5): "))
-    room_type = input(
-        "Enter the type of room the guest wants (king, queen, double, single): ").casefold()
-    check_in = input('Enter your check in date (Jun 10 2020): ')
-    check_in = datetime.datetime.strptime(check_in, '%b %d %Y')
-    check_in = check_in.replace(hour=13, minute=00)
-    days_staying = int(input("Enter how many days the guest be staying: "))
+    # num_rooms = int(
+    #     input("Enter how many rooms the guest needs (no more than 5): "))
+    # room_type = input(
+    #     "Enter the type of room the guest wants (king, queen, double, single): ").casefold()
+    # check_in = input('Enter your check in date (Jun 10 2020): ')
+    # check_in = datetime.datetime.strptime(check_in, '%b %d %Y')
+    # check_in = check_in.replace(hour=13, minute=00)
+    # days_staying = int(input("Enter how many days the guest be staying: "))
 
-    check_out = (check_in + datetime.timedelta(days=days_staying))
-    check_out = check_out.replace(hour=11, minute=00)
+    # check_out = (check_in + datetime.timedelta(days=days_staying))
+    # check_out = check_out.replace(hour=11, minute=00)
 
-    conn = sqlite3.connect('hoteldb')
+    conn = sqlite3.connect('hotel.db')
     c = conn.cursor()
-    insert_statement = 'INSERT INTO guests(name, phone_number, num_rooms, room_type, days_staying, check_in, check_out) VALUES(?, ?, ?, ?, ?, ?, ?)'
-    c.execute(insert_statement, (name, phone_number, num_rooms,
-                                 room_type, days_staying, check_in, check_out))
+    insert_statement = 'INSERT INTO guests(name, phone_number) VALUES(?, ?)'
+    c.execute(insert_statement, (name, phone_number))
     conn.commit()
 
 
 def get_guest():
-    guest_id = int(input('enter guest_id: '))
-    guest = Guest(guest_id)
-    print(guest.name)
+    phone_number = int(input('Enter guest\'s phone number > '))
+    guest = Guest(phone_number)
+    return guest
+
+
+def edit_guest():
+    guest = get_guest()
+    to_edit = int(
+        input("What do you want to edit? \n1. Phone Number, \n2. Name\n>"))
+    if to_edit == 1:
+        new_number = input("Please enter a new phone number (3323449506) >")
+        guest.edit_phone_number(new_number)
+    elif to_edit == 2:
+        new_name = input("Please enter a new name >")
+        guest.edit_name(new_name)
 
 
 def create_hotel():
@@ -167,43 +216,67 @@ def create_hotel():
     conn = sqlite3.connect('hotel.db')
     c = conn.cursor()
 
-    insert_statement = ('INSERT INTO hotels(hotel_name, tax_perc) VALUES(?, ?)')
+    insert_statement = (
+        'INSERT INTO hotels(hotel_name, tax_perc) VALUES(?, ?)')
     c.execute(insert_statement, (name, tax_perc))
+    conn.commit()
+
+    c.execute('SELECT * FROM hotels ORDER BY hotel_id DESC LIMIT 1')
+    hotel = c.fetchone()
+    print(hotel)
+    return hotel
+
+
+def get_hotel():
+    conn = sqlite3.connect('hotel.db')
+    c = conn.cursor()
+    c.execute('SELECT * FROM hotels')
+    hotels = c.fetchall()
+    for index, hotel in enumerate(hotels):
+        print(f'{index}:{hotel[1]}')
+    hotel_id = int(input('Which hotel do you want to manage? >'))
+    hotel = Hotel(hotel_id)
+    return hotel
 
 
 def create_db_tables():
     conn = sqlite3.connect('hotel.db')
     c = conn.cursor()
     c.execute('''CREATE TABLE hotels (hotel_id INTEGER PRIMARY KEY AUTOINCREMENT, hotel_name TEXT NOT NULL, tax_perc DECIMAL(2, 2))''')
-    c.execute('''CREATE TABLE room_types (room_type_id INTEGER PRIMARY KEY, description TEXT)''')
+    c.execute(
+        '''CREATE TABLE room_types (room_type_id INTEGER PRIMARY KEY, description TEXT)''')
     c.execute('''CREATE TABLE rooms (room_num INTEGER PRIMARY KEY, room_type_id INTEGER, rate DECIMAL(5, 2), availability INTEGER NULL DEFAULT 1,
                  FOREIGN KEY (room_type_id) REFERENCES room_types (room_type_id))''')
     c.execute('''CREATE TABLE reservations (reservation_id INTEGER PRIMARY KEY AUTOINCREMENT, guest_id INTEGER, room_num INTEGER, check_in DATETIME NOT NULL, check_out DATETIME NOT NULL,
-                 FOREIGN KEY (guest_id) REFERENCES guests (phone_number),
+                 FOREIGN KEY (guest_id) REFERENCES guests (guest_id),
                  FOREIGN KEY (room_num) REFERENCES rooms(room_num))''')
-    c.execute('''CREATE TABLE guests (phone_number INTEGER PRIMARY KEY, name VARCHAR(50), reservation_id INTEGER, hotel_id INTEGER,
-                 FOREIGN KEY (hotel_id) REFERENCES hotels (hotel_id),
-                 FOREIGN KEY (reservation_id) REFERENCES reservations (reservation_id))''')
+    c.execute(
+        '''CREATE TABLE guests (guest_id INTEGER PRIMARY KEY, phone_number INTEGER UNIQUE NOT NULL, name VARCHAR(50))''')
     c.execute('''CREATE TABLE reservation_has_rooms (reservation_id INTEGER, room_id INTEGER,
                  FOREIGN KEY (reservation_id) REFERENCES reservations (reservation_id),
                  FOREIGN KEY (room_id) REFERENCES rooms (room_id))''')
     c.execute('''CREATE TABLE cancellations (cancellation_id INTEGER PRIMARY KEY NOT NULL, reservation_id INTEGER,
                  FOREIGN KEY (reservation_id) REFERENCES reservations (reservation_id))''')
 
-def main(hn, tp):
-    create_db_tables()
-    while True:
-        print('Welcome to the Hotel Management System.')
-        hotel_thing = input('Which are you doing? \n 1. Managing an Existing Hotel, or \n 2 Creating a New Hotel?')
-        if int(hotel_thing) == 1:
-            continue
-        elif int(hotel_thing) == 2:
-            create_hotel()
 
+def main():
+    # create_db_tables()
+    print('Welcome to the Hotel Management System.')
+    hotel_thing = input(
+        'Which are you doing? \n1. Managing an Existing Hotel, or \n2. Creating a New Hotel? \n>')
+    if int(hotel_thing) == 1:
+        hotel = get_hotel()
+    elif int(hotel_thing) == 2:
+        hotel = create_hotel()
+    else:
+        return
+    print(f'We are managing the {hotel.name} hotel.')
+    while True:
         thing = input(
-            'What do you want to do? \n 1. Manage Guest \n 2. Manage Reservation \n 3. OTHER (TBD) \n')
+            'What do you want to do? \n1. Manage Guest \n2. Manage Reservation \n3. OTHER (TBD) \n>')
         if int(thing) == 1:
-            guest_thing = input('What do you want to do? \n 1. Create Guest, \n 2. Retrieve Guest \n 3. Edit Guest Information \n\t')
+            guest_thing = input(
+                'What do you want to do? \n1. Create Guest, \n2. Retrieve Guest \n3. Edit Guest Information \n>')
             if int(guest_thing) == 1:
                 create_guest()
             elif int(guest_thing) == 2:
@@ -213,7 +286,8 @@ def main(hn, tp):
             else:
                 break
         elif int(thing) == 2:
-            reservation_thing = input('What do you want to do? \n 1. New Reservation, 2. Alter An Existing Reservation, Cancel Reservation')
+            reservation_thing = input(
+                'What do you want to do? \n 1. New Reservation, 2. Alter An Existing Reservation, Cancel Reservation')
             if int(reservation_thing) == 1:
                 create_reservation()
             elif int(reservation_thing) == 2:
@@ -226,25 +300,5 @@ def main(hn, tp):
             break
 
 
-
-def parse_args(arglist):
-    parser = ArgumentParser()
-    parser.add_argument("-hn", "--hotel_name", default='Random Hotel',
-                        type=str, help="The name of the hotel")
-    parser.add_argument("-tp", "--tax_perc", default=.1, type=float,
-                        help="The amount of tax the hotel charges per transaction")
-    # parser.add_argument("-n", "--name", type = str, help = "Enter your name")
-    # parser.add_argument("-p", "--phone_number", type = str, help = "guests phone number")
-    # parser.add_argument("-nr", "--num_rooms",type = int, help = "number of rooms you want to reserve")
-    # parser.add_argument("-rt","--room_type", type = str, help = "room types: single, double, queen, king")
-    # parser.add_argument("-ci", "--check_in", help = "enter check in date in 'YYYY/MM/DD' format")
-    # parser.add_argument("-co", "--check_out", help = "enter check out date in 'YYYY/MM/DD' format")
-    args = parser.parse_args(arglist)
-
-    return args
-
-
 if __name__ == "__main__":
-    args = parse_args(sys.argv[1:])
-    main(hn=args.hotel_name, tp=args.tax_perc)
-
+    main()
