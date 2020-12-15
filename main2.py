@@ -161,7 +161,7 @@ def get_guest():
     print(guest.name)
 
 def create_db_tables():
-    conn = sqlite3.connect('hoteldb')
+    conn = sqlite3.connect('hotel.db')
     c = conn.cursor()
     c.execute ('''CREATE TABLE hotels (hotel_id INTEGER PRIMARY KEY AUTOINCREMENT, hotel_name text NOT NULL)''')
     c.execute('''CREATE TABLE room_types (room_type INTEGER PRIMARY KEY, description text)''')
