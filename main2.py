@@ -147,7 +147,7 @@ def create_guest():
     check_out = (check_in + datetime.timedelta(days=days_staying))
     check_out = check_out.replace(hour=11, minute=00)
 
-    conn = sqlite3.connect('hotel.db')
+    conn = sqlite3.connect('hoteldb')
     c = conn.cursor()
     insert_statement = 'INSERT INTO guests(name, phone_number, num_rooms, room_type, days_staying, check_in, check_out) VALUES(?, ?, ?, ?, ?, ?, ?)'
     c.execute(insert_statement, (name, phone_number, num_rooms,
@@ -161,10 +161,21 @@ def get_guest():
     print(guest.name)
 
 def create_db_tables():
-    conn = sqlite3.connect('hotel.db')
+    conn = sqlite3.connect('hoteldb')
     c = conn.cursor()
-    c.execute(''' CREATE TABLE guests (guest_id INTEGER PRIMARY KEY AUTOINCREMENT, name text, phone_number text unique, num_rooms int, room_type int, days_staying int, check_in date, check_out date)''')
-
+    c.execute ('''CREATE TABLE hotels (hotel_id INTEGER PRIMARY KEY AUTOINCREMENT, hotel_name text NOT NULL)''')
+    c.execute('''CREATE TABLE room_types (room_type INTEGER PRIMARY KEY, description text)''')
+    c.execute ('''CREATE TABLE rooms (room_num INTEGER PRIMARY KEY, room_type INTEGER, rate INTEGER, availability INTEGER NULL DEFAULT 1,
+                FOREIGN KEY (room_type) REFERENCES room_types (room_type))''')
+    c.execute('''CREATE TABLE reservations (reservation_id INTEGER PRIMARY KEY AUTOINCREMENT, guest_id INTEGER, room_num INTEGER, num_rooms INTEGER, room_type INTEGER, check_in DATETIME, check_out DATETIME,
+                FOREIGN KEY (guest_id) REFERENCES guests ('phone_number'),
+                FOREIGN KEY (room_num) REFERENCES rooms(room_num),
+                FOREIGN KEY (room_type) REFERENCES room_types (room_type))''')
+    c.execute ('''CREATE TABLE guests (phone_number INTEGER PRIMARY KEY UNIQUE, name VARCHAR(50), reservation_id INTEGER, hotel_id INTEGER,
+            FOREIGN KEY (hotel_id) REFERENCES hotels (hotel_id),
+            FOREIGN KEY (reservation_id) REFERENCES reservations (reservation_id))''')
+    c.execute ('''CREATE TABLE cancellations (cancellation_id INTEGER PRIMARY KEY NOT NULL, guest_id INTEGER,
+            FOREIGN KEY (guest_id) REFERENCES guests (phone_number))''')
 
 def main(hn, tp):
     create_db_tables()
