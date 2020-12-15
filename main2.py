@@ -160,6 +160,17 @@ def get_guest():
     guest = Guest(guest_id)
     print(guest.name)
 
+
+def create_hotel():
+    tax_perc = float(input('Enter the hotel tax percentage (0.1 for 10%): '))
+    name = input("Enter the name of the hotel: ")
+    conn = sqlite3.connect('hotel.db')
+    c = conn.cursor()
+
+    insert_statement = ('INSERT INTO hotels(hotel_name, tax_perc) VALUES(?, ?)')
+    c.execute(insert_statement, (name, tax_perc))
+
+
 def create_db_tables():
     conn = sqlite3.connect('hotel.db')
     c = conn.cursor()
@@ -182,24 +193,38 @@ def create_db_tables():
 def main(hn, tp):
     create_db_tables()
     while True:
-        thing = input(
-            'What do you want to do? \n 1. Create Hotel \n 2. Manage Guest \n 3. Exit \n\t')
-        if int(thing) == 1:
+        print('Welcome to the Hotel Management System.')
+        hotel_thing = input('Which are you doing? \n 1. Managing an Existing Hotel, or \n 2 Creating a New Hotel?')
+        if int(hotel_thing) == 1:
+            continue
+        elif int(hotel_thing) == 2:
             create_hotel()
-        if int(thing) == 2:
-            guest_thing = input('What do you want to do? \n 1. Create Guest, \n 2. Retrieve Guest \n 3. Exit \n\t')
+
+        thing = input(
+            'What do you want to do? \n 1. Manage Guest \n 2. Manage Reservation \n 3. OTHER (TBD) \n')
+        if int(thing) == 1:
+            guest_thing = input('What do you want to do? \n 1. Create Guest, \n 2. Retrieve Guest \n 3. Edit Guest Information \n\t')
             if int(guest_thing) == 1:
                 create_guest()
             elif int(guest_thing) == 2:
                 get_guest()
             elif int(guest_thing) == 3:
+                edit_guest()
+            else:
                 break
-        if int(thing) == 3:
+        elif int(thing) == 2:
+            reservation_thing = input('What do you want to do? \n 1. New Reservation, 2. Alter An Existing Reservation, Cancel Reservation')
+            if int(reservation_thing) == 1:
+                create_reservation()
+            elif int(reservation_thing) == 2:
+                alter_reservation()
+            elif int(reservation_thing) == 3:
+                cancel_reservation()
+        elif int(thing) == 3:
+            pass
+        else:
             break
 
-    hotel_obj = Hotel(hn, tp, guest_obj)
-    total_cost = hotel_obj.t_cost()
-    rooms_booked = hotel_obj.occupied()
 
 
 def parse_args(arglist):
