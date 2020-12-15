@@ -147,11 +147,7 @@ def create_guest():
     check_out = (check_in + datetime.timedelta(days=days_staying))
     check_out = check_out.replace(hour=11, minute=00)
 
-    # guest_obj = Guest(name, phone_number, num_rooms,
-    #                   room_type, days_staying, check_in, check_out)
-
     conn = sqlite3.connect('hotel.db')
-
     c = conn.cursor()
     insert_statement = 'INSERT INTO guests(name, phone_number, num_rooms, room_type, days_staying, check_in, check_out) VALUES(?, ?, ?, ?, ?, ?, ?)'
     c.execute(insert_statement, (name, phone_number, num_rooms,
@@ -167,11 +163,11 @@ def get_guest():
 def create_db_tables():
     conn = sqlite3.connect('hotel.db')
     c = conn.cursor()
-    c.execute(''' CREATE TABLE guests (guest_id INTEGER PRIMARY KEY AUTOINCREMENT, name text, phone_number text, num_rooms int, room_type int, days_staying int, check_in date, check_out date)''')
+    c.execute(''' CREATE TABLE guests (guest_id INTEGER PRIMARY KEY AUTOINCREMENT, name text, phone_number text unique, num_rooms int, room_type int, days_staying int, check_in date, check_out date)''')
 
 
 def main(hn, tp):
-    # create_db_tables()
+    create_db_tables()
     while True:
         thing = input(
             'What do you want to do? \n 1. Create Hotel \n 2. Manage Guest \n 3. Exit \n\t')
