@@ -59,13 +59,7 @@ class Hotel:
         
     """
 
-<<<<<<< HEAD
     def __init__(self, name, tax_perc):
-=======
-    def __init__(self, name, tax_perc): # I, Samson, removed the attribute 'rooms' for the parse args func to work. 
-                                        # I could add another argument in the parse func instead, but I am not sure if that is necessary. If it is we can do so.
-
->>>>>>> 105f3776f4838f58309dd1f2672878a9ac24c477
         """ Initializes a Hotel object.
 
         Args:
