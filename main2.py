@@ -192,17 +192,16 @@ def get_reservation(reservation_id):
 def get_reservations():
     conn = sqlite3.connect('hotel.db')
     c = conn.cursor()
-
-    phone_number = int(input('Enter guest\'s phone number >'))
     while True:
+        phone_number = int(input('Enter guest\'s phone number >'))
         try:
             # If the guest doesn't already exist, move to the except statement.
             get_guest(phone_number=phone_number)
-        except ValueError:
+            break
+        except TypeError:
             print('No reservation under that phone number were found.')
             continue
-        else:
-            break
+
     query = 'SELECT * FROM reservations WHERE guest_id = (SELECT guest_id FROM guests WHERE phone_number = ?);'
     c.execute(query, (phone_number,))
     # Print the reservations for the specific guests and have them select which reservation by id.
@@ -295,7 +294,7 @@ def main():
     # create_rooms()
     print('Welcome to the Hotel Management System.')
     hotel_thing = input(
-        'Which are you doing? \n1. Managing an Existing Hotel, or \n2. Creating a New Hotel? \n>')
+        'Which are you doing? \n0. Exit\n1. Managing an Existing Hotel, or \n2. Creating a New Hotel? \n>')
     if int(hotel_thing) == 1:
         hotel = get_hotel()
     elif int(hotel_thing) == 2:
@@ -305,10 +304,10 @@ def main():
     print(f'We are managing the {hotel.name} hotel.')
     while True:
         thing = input(
-            'What do you want to do? \n1. Manage Guest \n2. Manage Reservation \n3. OTHER (TBD) \n>')
+            'What do you want to do? \n0. Back\n1. Manage Guest \n2. Manage Reservation \n3. OTHER (TBD) \n>')
         if int(thing) == 1:
             guest_thing = input(
-                'What do you want to do? \n1. Create Guest, \n2. Retrieve Guest \n3. Edit Guest Information \n>')
+                'What do you want to do? \n0. Back\n1. Create Guest, \n2. Retrieve Guest \n3. Edit Guest Information \n>')
             if int(guest_thing) == 1:
                 create_guest()
             elif int(guest_thing) == 2:
@@ -319,7 +318,7 @@ def main():
                 break
         elif int(thing) == 2:
             reservation_thing = input(
-                'What do you want to do? \n1. New Reservation, \n2. View Reservation, \n3. Edit An Existing Reservation, \n4. Cancel Reservation\n>')
+                'What do you want to do? \n0. Back\n1. New Reservation, \n2. View Reservation, \n3. Edit An Existing Reservation, \n4. Cancel Reservation\n>')
             if int(reservation_thing) == 1:
                 create_reservation()
             elif int(reservation_thing) == 2:
