@@ -73,20 +73,23 @@ def get_hotel():
 
 
 def create_reservation():
+    conn = sqlite3.connect('hotel.db')
+    c = conn.cursor()
     guest = get_guest()
     num_rooms = int(
         int(input("Enter how many rooms the guest needs (no more than 5): ")))
-    room_types = list()
+    rooms = list()
     for room in range(num_rooms):
         room_type = input(
             f"Enter the type of room #{room + 1} the guest wants (king, queen, double, single): ").casefold()
-        room_types.append(room_type)
-
-    conn = sqlite3.connect('hotel.db')
-    c = conn.cursor()
-    for room in room_types:
-        c.execute(
-            'SELECT * FROM rooms WHERE room_type_id IN (SELECT room_type_id FROM room_types WHERE description = ? )', room)
+        c.execute(f'''SELECT *
+                  FROM rooms
+                  WHERE room_type_id IN(SELECT room_type_id FROM room_types WHERE description='{room_type}') AND availability = 1;''')
+        if len(c.fetchall()) < 1:
+            room_type = input(
+                f"Sorry that room type isn't avialable. Please try again. \nEnter the type of room #{room + 1} the guest wants (king, queen, double, single): ").casefold()
+        rooms.append(c.fetchone())
+    print(rooms)
 
     check_in = input('Enter your check in date (Jun 10 2020): ')
     check_in = datetime.datetime.strptime(check_in, '%b %d %Y')
@@ -125,13 +128,16 @@ def main():
                 break
         elif int(thing) == 2:
             reservation_thing = input(
-                'What do you want to do? \n 1. New Reservation, 2. Alter An Existing Reservation, Cancel Reservation')
+                'What do you want to do? \n1. New Reservation,\n2. View Reservation\n3. Alter An Existing Reservation\n4. Cancel Reservation')
             if int(reservation_thing) == 1:
                 create_reservation()
             elif int(reservation_thing) == 2:
-                alter_reservation()
+                reservation = get_reservation()
+                print(reservation)
             elif int(reservation_thing) == 3:
-                cancel_reservation()
+                alter_reservation()
+            elif int(reservation_thing) == 4:
+                cancel_reservation
         elif int(thing) == 3:
             pass
         else:
