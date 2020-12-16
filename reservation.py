@@ -50,14 +50,24 @@ class Reservation:
             Changes the check in attribute.
         """
         c = self.conn.cursor()
-        try:
-            c.execute(
-                'UPDATE reservations SET check_in = ? WHERE reservation_id = ?', (
-                    new_date, self.reservation_id))
-            self.check_in = new_date
-            self.conn.commit()
-        except TypeError:
-            return 'Could not edit the reservation.'
+        # Get all rooms in the reservation.
+        query = f'''SELECT * FROM reservation_has_rooms WHERE reservation_id = {self.reservation_id}'''
+        c.execute(query)
+        rooms = c.fetchall()
+        new_check_in = new_date
+        for room in rooms:
+            # check each room to see if an early check in would interfere with someone else's late checkout.
+            # Select the rooms from reservation_has_rooms table that don't belong to this reservation_id and check those to see if dates interfere
+            query = f'''SELECT room_id FROM reservation_has_rooms JOIN reservations USING(reservation_id) WHERE reservation_id != {self.reservation_id} AND room_id = {room[0]} AND check_out >= "{new_check_in}"'''
+            c.execute(query)
+            rooms_available = c.fetchall()
+            if len(rooms_available) > 0:
+                raise EarlyCheckOutError(
+                    'Unfortunately that interferes with another guest\'s check in. Please try again.')
+        c.execute('UPDATE reservations SET check_in = ? WHERE reservation_id = ?',
+                  (new_check_in, self.reservation_id))
+        self.conn.commit()
+        self.check_in = new_check_in
 
     def edit_check_out(self, new_date):
         """ Edits the reservation check in date.
@@ -66,14 +76,28 @@ class Reservation:
             Changes the check in attribute.
         """
         c = self.conn.cursor()
-        try:
-            c.execute(
-                'UPDATE reservations SET check_out = ? WHERE reservation_id = ?', (
-                    new_date, self.reservation_id))
-            self.check_out = new_date
-            self.conn.commit()
-        except TypeError:
-            return 'No Reservation with this id found.'
+        # Get all rooms in the reservation.
+        query = f'''SELECT * FROM reservation_has_rooms WHERE reservation_id = {self.reservation_id}'''
+        c.execute(query)
+        rooms = c.fetchall()
+        new_check_out = new_date
+        for room in rooms:
+            # check each room to see if an early check in would interfere with someone else's late checkout.
+            # Select the rooms from reservation_has_rooms table that don't belong to this reservation_id and check those to see if dates interfere
+            query = f'''SELECT room_id FROM reservation_has_rooms JOIN reservations USING(reservation_id) WHERE reservation_id != {self.reservation_id} AND room_id = {room[0]} AND check_in <= "{new_check_out}"'''
+            c.execute(query)
+            rooms_available = c.fetchall()
+            if len(rooms_available) > 0:
+                raise EarlyCheckOutError(
+                    'Unfortunately that interferes with another guest\'s check in. Please try again.')
+        c.execute('UPDATE reservations SET check_out = ? WHERE reservation_id = ?',
+                  (new_check_out, self.reservation_id))
+        self.conn.commit()
+        self.check_out = new_check_out
+
+        c.execute(
+            'UPDATE reservations SET check_out = ? WHERE reservation_id = ?', (
+                new_date, self.reservation_id))
 
     def late_checkout(self, hours):
         """ Gives the guest a late checkout.
@@ -103,10 +127,10 @@ class Reservation:
 
                 raise EarlyCheckOutError(
                     'Unfortunately that interferes with another guest\'s check in. Please try again.')
-        c.execute('UPDATE reservations SET check_in = ? WHERE reservation_id = ?',
+        c.execute('UPDATE reservations SET check_out = ? WHERE reservation_id = ?',
                   (new_check_out, self.reservation_id))
         self.conn.commit()
-        self.check_in = new_check_out
+        self.check_out = new_check_out
 
     def early_checkin(self, hours):
         """ Gives the guest an early checkin.
