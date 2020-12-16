@@ -10,6 +10,7 @@ import sqlite3
 from guest import Guest
 from hotel import Hotel
 from room import Room
+from reservation import Reservation
 from create_db import create_db_tables, create_room_types, create_rooms
 
 
@@ -89,10 +90,8 @@ def create_reservation():
     phone_number = int(input('Enter guest\'s phone number >'))
     try:
         guest = get_guest(phone_number=phone_number)
-        print('try statement')
     except TypeError:
         guest = create_guest(phone_number=get_guest())
-        print('except')
     guest_id = guest.guest_id
     num_rooms = int(
         int(input("Enter how many rooms the guest needs (no more than 5): ")))
@@ -102,10 +101,11 @@ def create_reservation():
             f"Enter the type of room #{room + 1} the guest wants (king, queen, double, single): ").casefold()
         c.execute(
             f'''SELECT * FROM rooms WHERE room_type_id = (SELECT room_type_id FROM room_types WHERE description = '{room_type}') AND availability = 1;''')
-        if len(c.fetchall()) < 1:
+        rooms_available = c.fetchall()
+        if len(rooms_available) < 1:
             room_type = input(
                 f"Sorry that room type isn't avialable. Please try again. \nEnter the type of room #{room + 1} the guest wants (king, queen, double, single): ").casefold()
-        rooms.append(c.fetchone())
+        rooms.append(rooms_available[0])
 
     check_in = input('Enter your check in date (Jun 10 2020): ')
     check_in = datetime.datetime.strptime(check_in, '%b %d %Y')
@@ -116,6 +116,15 @@ def create_reservation():
     check_out = check_out.replace(hour=11, minute=00)
     insert_statement = 'INSERT INTO reservations (guest_id, check_in, check_out) VALUES (?, ?, ?)'
     c.execute(insert_statement, (guest_id, check_in, check_out))
+    conn.commit()
+    c.execute('SELECT * FROM reservations ORDER BY reservation_id DESC LIMIT 1')
+    reservation_id = c.fetchone()[0]
+    print(reservation_id)
+    reservation = Reservation(reservation_id)
+    for room in rooms:
+        print(room)
+        res_to_rooms_insert = 'INSERT INTO reservation_has_rooms VALUES (?, ?)'
+        c.execute(res_to_rooms_insert, (reservation.reservation_id, room[0]))
     conn.commit()
 
 

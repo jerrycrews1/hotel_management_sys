@@ -24,11 +24,12 @@ class Reservation:
         c.execute('SELECT * FROM reservations WHERE reservation_id = ?',
                   (reservation_id, ))
         reservation = c.fetchone()
-        
+        print(reservation)
+
         self.reservation_id = reservation[0]
         self.guest_id = reservation[1]
-        self.check_in = reservation[3]
-        self.check_out = reservation[4]
+        self.check_in = reservation[2]
+        self.check_out = reservation[3]
 
     def check_guest_in(self):
         """ Checks in the guest to the hotel.
