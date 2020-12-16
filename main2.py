@@ -207,9 +207,9 @@ def get_reservations():
     c.execute(query, (phone_number,))
     # Print the reservations for the specific guests and have them select which reservation by id.
     reservations = c.fetchall()
-    for index, reservation in enumerate(reservations):
+    for reservation in reservations:
         print(
-            f'{index + 1}: Check In: {reservation[2]} Check Out {reservation[3]}')
+            f'{reservation[0]}: Check In: {reservation[2]} Check Out {reservation[3]}')
     return reservations
 
 
@@ -218,7 +218,7 @@ def edit_reservation():
     reservation_id = int(input('Which reservation do you want to manage? >'))
     try:
         reservation = get_reservation(reservation_id)
-        reservation = Reservation(reservation.reservation_id)
+        reservation = Reservation(reservation[0])
     except TypeError:
         print('Sorry that reservation could not be found.')
     reservation_edit = int(input(
@@ -231,9 +231,34 @@ def edit_reservation():
     elif reservation_edit == 2:
         # Get the number of days stating and create the check_out datetime from that
         days_staying = int(input("Enter how many days the guest be staying >"))
+        check_in = reservation.check_in
         check_out = (reservation.check_in +
                      datetime.timedelta(days=days_staying))
         reservation.edit_check_out(check_out)
+    elif reservation_edit == 3:
+        while True:
+            hours = int(input(
+                'How many hours early would you like to check in? No more than 2 hours allowed. >'))
+            if hours > 2:
+                continue
+            try:
+                reservation.early_checkin(hours)
+                print('Your early check in has been approved.')
+                break
+            except:
+                continue
+    elif reservation_edit == 4:
+        while True:
+            hours = int(input(
+                'How many hours late would you like to check out? No more than 2 hours is allowed. >'))
+            if hours > 2:
+                continue
+            try:
+                reservation.late_checkout(hours)
+                print('Your late check out has been approved.')
+                break
+            except:
+                continue
 
 
 def cancel_reservation():

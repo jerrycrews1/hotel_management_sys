@@ -1,4 +1,15 @@
 import sqlite3
+import datetime
+
+
+class EarlyCheckInError(Exception):
+    """Raised when an early check in is not approved."""
+    pass
+
+
+class EarlyCheckOutError(Exception):
+    """Raised when an early check out is not approved."""
+    pass
 
 
 class Reservation:
@@ -24,12 +35,13 @@ class Reservation:
         c.execute('SELECT * FROM reservations WHERE reservation_id = ?',
                   (reservation_id, ))
         reservation = c.fetchone()
-        print(reservation)
 
         self.reservation_id = reservation[0]
         self.guest_id = reservation[1]
-        self.check_in = reservation[2]
-        self.check_out = reservation[3]
+        self.check_in = datetime.datetime.strptime(
+            reservation[2], '%Y-%m-%d %H:%M:%S')
+        self.check_out = datetime.datetime.strptime(
+            reservation[3], '%Y-%m-%d %H:%M:%S')
 
     def edit_check_in(self, new_date):
         """ Edits the reservation check in date.
@@ -41,8 +53,9 @@ class Reservation:
         try:
             c.execute(
                 'UPDATE reservations SET check_in = ? WHERE reservation_id = ?', (
-                    self.reservation_id, new_date))
+                    new_date, self.reservation_id))
             self.check_in = new_date
+            self.conn.commit()
         except TypeError:
             return 'Could not edit the reservation.'
 
@@ -56,8 +69,9 @@ class Reservation:
         try:
             c.execute(
                 'UPDATE reservations SET check_out = ? WHERE reservation_id = ?', (
-                    self.reservation_id, new_date))
+                    new_date, self.reservation_id))
             self.check_out = new_date
+            self.conn.commit()
         except TypeError:
             return 'No Reservation with this id found.'
 
@@ -72,11 +86,27 @@ class Reservation:
 
         Side Effects:
             Modifies the check_out attribute by adding the hours to it.
-
-        Returns:
-            (datetime): The new checkout date and time.
         """
-        pass
+        c = self.conn.cursor()
+        # Get all rooms in the reservation.
+        query = f'''SELECT * FROM reservation_has_rooms WHERE reservation_id = {self.reservation_id}'''
+        c.execute(query)
+        rooms = c.fetchall()
+        new_check_out = self.check_out + datetime.timedelta(hours=hours)
+        for room in rooms:
+            # check each room to see if an early check in would interfere with someone else's late checkout.
+            # Select the rooms from reservation_has_rooms table that don't belong to this reservation_id and check those to see if dates interfere
+            query = f'''SELECT room_id FROM reservation_has_rooms JOIN reservations USING(reservation_id) WHERE reservation_id != {self.reservation_id} AND room_id = {room[0]} AND check_in <= "{new_check_out}"'''
+            c.execute(query)
+            rooms_available = c.fetchall()
+            if len(rooms_available) > 0:
+
+                raise EarlyCheckOutError(
+                    'Unfortunately that interferes with another guest\'s check in. Please try again.')
+        c.execute('UPDATE reservations SET check_in = ? WHERE reservation_id = ?',
+                  (new_check_out, self.reservation_id))
+        self.conn.commit()
+        self.check_in = new_check_out
 
     def early_checkin(self, hours):
         """ Gives the guest an early checkin.
@@ -89,9 +119,27 @@ class Reservation:
             hours(int): The number of hours to subtract from the checkin time.
 
         Side Effects:
-            Modifies the check_in_date_time attribute by stubtracting hours from it.
-
-        Returns:
-            (datetime): The new checkin time.
+            Modifies the check_in attribute by stubtracting hours from it.
         """
-        pass
+        c = self.conn.cursor()
+        # Get all rooms in the reservation.
+
+        query = f'''SELECT * FROM reservation_has_rooms WHERE reservation_id = {self.reservation_id}'''
+        c.execute(query)
+        rooms = c.fetchall()
+        new_check_in = self.check_in - datetime.timedelta(hours=hours)
+        for room in rooms:
+
+            # check each room to see if an early check in would interfere with someone else's late checkout.
+            # Select the rooms from reservation_has_rooms table that don't belong to this reservation_id and check those to see if dates interfere
+            query = f'''SELECT room_id FROM reservation_has_rooms JOIN reservations USING(reservation_id) WHERE reservation_id != {self.reservation_id} AND room_id = {room[0]} AND check_out >= "{new_check_in}"'''
+            c.execute(query)
+            rooms_available = c.fetchall()
+            if len(rooms_available) > 0:
+
+                raise EarlyCheckInError(
+                    'Unfortunately that interferes with another guest\'s checkout. Please try again.')
+        c.execute('UPDATE reservations SET check_in = ? WHERE reservation_id = ?',
+                  (new_check_in, self.reservation_id))
+        self.conn.commit()
+        self.check_in = new_check_in
