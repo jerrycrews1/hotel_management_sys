@@ -311,7 +311,8 @@ def main():
             if int(guest_thing) == 1:
                 create_guest()
             elif int(guest_thing) == 2:
-                get_guest()
+                guest = get_guest()
+                print(f'Name: {guest.name}\nPhone: {guest.phone_number}')
             elif int(guest_thing) == 3:
                 edit_guest()
             else:
