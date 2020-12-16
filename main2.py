@@ -10,7 +10,7 @@ import sqlite3
 from guest import Guest
 from hotel import Hotel
 from room import Room
-from create_db import create_db_tables
+from create_db import create_db_tables, create_room_types, create_rooms
 
 
 def create_guest():
@@ -102,6 +102,8 @@ def create_reservation():
 
 def main():
     # create_db_tables()
+    # create_room_types()
+    create_rooms()
     print('Welcome to the Hotel Management System.')
     hotel_thing = input(
         'Which are you doing? \n1. Managing an Existing Hotel, or \n2. Creating a New Hotel? \n>')
