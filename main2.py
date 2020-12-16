@@ -25,7 +25,7 @@ def create_guest():
 
 
 def get_guest():
-    phone_number = int(input('Enter guest\'s phone number > '))
+    phone_number = int(input('Enter guest\'s phone number >'))
     guest = Guest(phone_number)
     return guest
 
@@ -82,14 +82,12 @@ def create_reservation():
     for room in range(num_rooms):
         room_type = input(
             f"Enter the type of room #{room + 1} the guest wants (king, queen, double, single): ").casefold()
-        c.execute(f'''SELECT *
-                  FROM rooms
-                  WHERE room_type_id IN(SELECT room_type_id FROM room_types WHERE description='{room_type}') AND availability = 1;''')
+        c.execute(
+            f'''SELECT * FROM rooms WHERE room_type_id = (SELECT room_type_id FROM room_types WHERE description = '{room_type}') AND availability = 1;''')
         if len(c.fetchall()) < 1:
             room_type = input(
                 f"Sorry that room type isn't avialable. Please try again. \nEnter the type of room #{room + 1} the guest wants (king, queen, double, single): ").casefold()
         rooms.append(c.fetchone())
-    print(rooms)
 
     check_in = input('Enter your check in date (Jun 10 2020): ')
     check_in = datetime.datetime.strptime(check_in, '%b %d %Y')
@@ -103,7 +101,7 @@ def create_reservation():
 def main():
     # create_db_tables()
     # create_room_types()
-    create_rooms()
+    # create_rooms()
     print('Welcome to the Hotel Management System.')
     hotel_thing = input(
         'Which are you doing? \n1. Managing an Existing Hotel, or \n2. Creating a New Hotel? \n>')
