@@ -1,5 +1,6 @@
 import sqlite3
 import datetime
+from datetime import date
 
 
 class EarlyCheckInError(Exception):
@@ -55,19 +56,23 @@ class Reservation:
         c = self.conn.cursor()
         # If add is False, we subtract the amount
         if amount and not add:
-            self.cost -= amount
+            self.cost += amount
         # If add is true, we add (or credit) the user's reservation
         elif amount and add:
-            self.cost += amount
+            self.cost -= amount
         # if amount isn't provided (at the beginning), and add is false (by default) calculate the amount of the reservation.
         else:
-            query = f'''SELECT * FROM reservation_has_rooms WHERE reservation_id = {self.reservation_id}'''
+            query = f'''SELECT room_num, rate FROM rooms JOIN reservation_has_rooms ON (room_num = room_id) WHERE reservation_id = {self.reservation_id}'''
             c.execute(query)
             rooms = c.fetchall()
+            num_days = self.check_out - self.check_in
+            days = num_days.days + 1
             for room in rooms:
-                print(room)
-                self.cost += room[int(2)]
-            print('edting cost')
+                self.cost += room[1] * days
+            c = self.conn.cursor()
+            query = 'UPDATE reservations SET cost = ? WHERE reservation_id = ? and hotel_id = ?'
+            c.execute(query, (self.cost, self.reservation_id, self.hotel_id))
+            self.conn.commit()
             return self.cost
 
     def edit_check_in(self, new_date):

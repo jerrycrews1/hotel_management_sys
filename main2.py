@@ -161,14 +161,14 @@ def create_reservation(hotel_id):
             c.execute(
                 f'''SELECT * FROM reservations WHERE hotel_id = {hotel_id} ORDER BY reservation_id  DESC LIMIT 1''')
             reservation_id = c.fetchone()[0]
-            reservation = Reservation(reservation_id)
             # Loop through each room the user wants and add it to the reservation_has_rooms table in the db.
             rooms = list(rooms)[-num_rooms:]
             for room in rooms:
                 res_to_rooms_insert = 'INSERT INTO reservation_has_rooms VALUES (?, ?)'
                 c.execute(res_to_rooms_insert,
-                          (reservation.reservation_id, room[0]))
+                          (reservation_id, room[0]))
             conn.commit()
+            reservation = Reservation(reservation_id)
             break
         elif len(rooms_avialable_on_dates) < num_rooms:
             print("Sorry! Those rooms aren't available for those dates.")
