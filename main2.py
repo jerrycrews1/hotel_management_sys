@@ -128,20 +128,23 @@ def create_reservation():
             int(input("Enter how many rooms the guest needs (no more than 5) >")))
 
         rooms = list()
+        # Get the rooms that are available on those dates
         rooms_avialable_on_dates = get_avialable_rooms_by_date(
             check_in, check_out, num_rooms)
+        # If there are rooms, proceed.
         if len(rooms_avialable_on_dates) >= num_rooms:
             # Loop through each room the user wants and check if the type is available.
-            # If it is, add it to the rooms list, if not, ask again.
             for room in range(num_rooms):
                 while True:
                     room_type = input(
                         f"Enter the type of room #{room + 1} the guest wants (king, queen, double, single) >").casefold()
+                    # Get the rooms that are availabe of this type
                     rooms_avialable_by_type = get_available_rooms_by_type(
                         room_type)
-
+                    # Make a set of rooms which are available on those dates AND by that type
                     rooms = (set(rooms_avialable_on_dates) &
                              set(rooms_avialable_by_type))
+                    # If there are rooms, proceed, else try again.
                     if len(rooms) > 0:
                         break
                     else:
@@ -177,9 +180,9 @@ def create_reservation():
 def get_reservation(reservation_id):
     conn = sqlite3.connect('hotel.db')
     c = conn.cursor()
-    query = c.execute('SELECT * FROM reservations WHERE reservation_id = ?')
+    query = '''SELECT * FROM reservations WHERE reservation_id = ?'''
     try:
-        c.execute(query, (reservation_id))
+        c.execute(query, (reservation_id,))
         reservation = c.fetchone()
         return reservation
     except TypeError:
@@ -233,6 +236,34 @@ def edit_reservation():
         reservation.edit_check_out(check_out)
 
 
+def cancel_reservation():
+    conn = sqlite3.connect('hotel.db')
+    c = conn.cursor()
+    while True:
+        get_reservations()
+        reservation_id = int(
+            input('Which reservation do you want to manage? >'))
+        try:
+            reservation = get_reservation(reservation_id)
+            reservation = Reservation(reservation[0])
+            print(reservation.reservation_id)
+            # Delete the reservation from the reservation has rooms table first to prevent orphan record.
+            delete_res_to_rooms_query = f'''DELETE FROM reservation_has_rooms WHERE reservation_id = {reservation.reservation_id}'''
+            c.execute(delete_res_to_rooms_query)
+            # Delete the reservation from the reservation table.
+            delte_res_query = f'''DELETE FROM reservations WHERE reservation_id = {reservation.reservation_id}'''
+            c.execute(delte_res_query)
+            insert_into_cancellations_query = f'INSERT INTO cancellations(reservation_id) VALUES({reservation.reservation_id})'
+            c.execute(insert_into_cancellations_query)
+            conn.commit()
+            break
+        except TypeError:
+            print('Sorry that reservation could not be found.')
+            continue
+    print('Reservation deleted')
+    return
+
+
 def main():
     # create_db_tables()
     # create_room_types()
@@ -267,11 +298,13 @@ def main():
             if int(reservation_thing) == 1:
                 create_reservation()
             elif int(reservation_thing) == 2:
-                reservation = get_reservations()
+                get_reservations()
             elif int(reservation_thing) == 3:
                 edit_reservation()
             elif int(reservation_thing) == 4:
-                cancel_reservation
+                cancel_reservation()
+            else:
+                break
         elif int(thing) == 3:
             pass
         else:
