@@ -159,10 +159,11 @@ def create_reservation(hotel_id):
             conn.commit()
             # Get the reservation back from the db
             c.execute(
-                f'''SELECT * FROM reservations ORDER BY reservation_id WHERE hotel_id = {hotel_id} DESC LIMIT 1''')
+                f'''SELECT * FROM reservations WHERE hotel_id = {hotel_id} ORDER BY reservation_id  DESC LIMIT 1''')
             reservation_id = c.fetchone()[0]
             reservation = Reservation(reservation_id)
             # Loop through each room the user wants and add it to the reservation_has_rooms table in the db.
+            rooms = list(rooms)[-num_rooms:]
             for room in rooms:
                 res_to_rooms_insert = 'INSERT INTO reservation_has_rooms VALUES (?, ?)'
                 c.execute(res_to_rooms_insert,
@@ -174,7 +175,8 @@ def create_reservation(hotel_id):
             continue
         else:
             continue
-    print(f'Your reservation has been created, thank you {guest.name}. The cost is ${reservation.cost}.')
+    print(
+        f'Your reservation has been created, thank you {guest.name}. The cost is ${reservation.cost}.')
     return reservation
 
 

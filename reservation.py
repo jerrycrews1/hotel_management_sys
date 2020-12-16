@@ -43,12 +43,7 @@ class Reservation:
             reservation[2], '%Y-%m-%d %H:%M:%S')
         self.check_out = datetime.datetime.strptime(
             reservation[3], '%Y-%m-%d %H:%M:%S')
-        if reservation[4]:
-            print('null')
-            self.cost = reservation[4]
-        else:
-            self.cost = 0
-
+        self.cost = float(reservation[4])
         self.hotel_id = reservation[5]
 
         self.edit_cost()
@@ -72,7 +67,7 @@ class Reservation:
             for room in rooms:
                 print(room)
                 self.cost += room[int(2)]
-            print(self.cost)
+            print('edting cost')
             return self.cost
 
     def edit_check_in(self, new_date):

@@ -10,7 +10,7 @@ def create_db_tables():
         '''CREATE TABLE room_types (room_type_id INTEGER PRIMARY KEY, description TEXT)''')
     c.execute('''CREATE TABLE rooms (room_num INTEGER PRIMARY KEY, room_type_id INTEGER, rate DECIMAL(5, 2),
                  FOREIGN KEY (room_type_id) REFERENCES room_types (room_type_id))''')
-    c.execute('''CREATE TABLE reservations (reservation_id INTEGER PRIMARY KEY AUTOINCREMENT, guest_id INTEGER, check_in DATETIME NOT NULL, check_out DATETIME NOT NULL, cost DECIMAL(6, 2), hotel_id INTEGER,
+    c.execute('''CREATE TABLE reservations (reservation_id INTEGER PRIMARY KEY AUTOINCREMENT, guest_id INTEGER, check_in DATETIME NOT NULL, check_out DATETIME NOT NULL, cost DECIMAL(6, 2) DEFAULT 0, hotel_id INTEGER,
                  FOREIGN KEY (guest_id) REFERENCES guests (guest_id),
                  FOREIGN KEY (hotel_id) REFERENCES guests (hotel_id))''')
     c.execute(
