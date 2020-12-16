@@ -97,7 +97,7 @@ def get_hotel():
     return hotel
 
 
-def create_reservation():
+def create_reservation(hotel_id):
     ''' Creates a new reservation
 
     Returns:
@@ -153,12 +153,13 @@ def create_reservation():
                         continue
 
             # Add the reservation to the db
-            insert_statement = 'INSERT INTO reservations (guest_id, check_in, check_out) VALUES (?, ?, ?)'
-            c.execute(insert_statement, (guest_id, check_in, check_out))
+            insert_statement = 'INSERT INTO reservations (guest_id, check_in, check_out, hotel_id) VALUES (?, ?, ?, ?)'
+            c.execute(insert_statement, (guest_id,
+                                         check_in, check_out, hotel_id))
             conn.commit()
             # Get the reservation back from the db
             c.execute(
-                'SELECT * FROM reservations ORDER BY reservation_id DESC LIMIT 1')
+                f'''SELECT * FROM reservations ORDER BY reservation_id WHERE hotel_id = {hotel_id} DESC LIMIT 1''')
             reservation_id = c.fetchone()[0]
             reservation = Reservation(reservation_id)
             # Loop through each room the user wants and add it to the reservation_has_rooms table in the db.
@@ -173,23 +174,23 @@ def create_reservation():
             continue
         else:
             continue
-    print(f'Your reservation has been created, thank you {guest.name}')
+    print(f'Your reservation has been created, thank you {guest.name}. The cost is ${reservation.cost}.')
     return reservation
 
 
-def get_reservation(reservation_id):
+def get_reservation(reservation_id, hotel_id):
     conn = sqlite3.connect('hotel.db')
     c = conn.cursor()
-    query = '''SELECT * FROM reservations WHERE reservation_id = ?'''
+    query = '''SELECT * FROM reservations WHERE reservation_id = ? AND hotel_id = ?'''
     try:
-        c.execute(query, (reservation_id,))
+        c.execute(query, (reservation_id, hotel_id))
         reservation = c.fetchone()
         return reservation
     except TypeError:
         return 'Sorry, that reservation wasn\'t found'
 
 
-def get_reservations():
+def get_reservations(hotel_id):
     conn = sqlite3.connect('hotel.db')
     c = conn.cursor()
     while True:
@@ -202,8 +203,8 @@ def get_reservations():
             print('No reservation under that phone number were found.')
             continue
 
-    query = 'SELECT * FROM reservations WHERE guest_id = (SELECT guest_id FROM guests WHERE phone_number = ?);'
-    c.execute(query, (phone_number,))
+    query = 'SELECT * FROM reservations WHERE guest_id = (SELECT guest_id FROM guests WHERE phone_number = ?) AND hotel_id = ?;'
+    c.execute(query, (phone_number, hotel_id))
     # Print the reservations for the specific guests and have them select which reservation by id.
     reservations = c.fetchall()
     for reservation in reservations:
@@ -212,11 +213,11 @@ def get_reservations():
     return reservations
 
 
-def edit_reservation():
-    get_reservations()
+def edit_reservation(hotel_id):
+    get_reservations(hotel_id)
     reservation_id = int(input('Which reservation do you want to manage? >'))
     try:
-        reservation = get_reservation(reservation_id)
+        reservation = get_reservation(reservation_id, hotel_id)
         reservation = Reservation(reservation[0])
     except TypeError:
         print('Sorry that reservation could not be found.')
@@ -260,22 +261,21 @@ def edit_reservation():
                 continue
 
 
-def cancel_reservation():
+def cancel_reservation(hotel_id):
     conn = sqlite3.connect('hotel.db')
     c = conn.cursor()
     while True:
-        get_reservations()
+        get_reservations(hotel_id)
         reservation_id = int(
             input('Which reservation do you want to manage? >'))
         try:
-            reservation = get_reservation(reservation_id)
+            reservation = get_reservation(reservation_id, hotel_id)
             reservation = Reservation(reservation[0])
-            print(reservation.reservation_id)
             # Delete the reservation from the reservation has rooms table first to prevent orphan record.
-            delete_res_to_rooms_query = f'''DELETE FROM reservation_has_rooms WHERE reservation_id = {reservation.reservation_id}'''
+            delete_res_to_rooms_query = f'''DELETE FROM reservation_has_rooms WHERE reservation_id = {reservation.reservation_id} '''
             c.execute(delete_res_to_rooms_query)
             # Delete the reservation from the reservation table.
-            delte_res_query = f'''DELETE FROM reservations WHERE reservation_id = {reservation.reservation_id}'''
+            delte_res_query = f'''DELETE FROM reservations WHERE reservation_id = {reservation.reservation_id} AND hotel_id = {hotel_id}'''
             c.execute(delte_res_query)
             insert_into_cancellations_query = f'INSERT INTO cancellations(reservation_id) VALUES({reservation.reservation_id})'
             c.execute(insert_into_cancellations_query)
@@ -301,6 +301,7 @@ def main():
         hotel = create_hotel()
     else:
         return
+    hotel_id = hotel.hotel_id
     print(f'We are managing the {hotel.name} hotel.')
     while True:
         thing = input(
@@ -316,18 +317,18 @@ def main():
             elif int(guest_thing) == 3:
                 edit_guest()
             else:
-                break
+                continue
         elif int(thing) == 2:
             reservation_thing = input(
                 'What do you want to do? \n0. Back\n1. New Reservation, \n2. View Reservation, \n3. Edit An Existing Reservation, \n4. Cancel Reservation\n>')
             if int(reservation_thing) == 1:
-                create_reservation()
+                create_reservation(hotel_id)
             elif int(reservation_thing) == 2:
-                get_reservations()
+                get_reservations(hotel_id)
             elif int(reservation_thing) == 3:
-                edit_reservation()
+                edit_reservation(hotel_id)
             elif int(reservation_thing) == 4:
-                cancel_reservation()
+                cancel_reservation(hotel_id)
             else:
                 break
         elif int(thing) == 3:

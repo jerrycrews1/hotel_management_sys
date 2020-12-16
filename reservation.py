@@ -21,6 +21,7 @@ class Reservation:
         room_num (int): The room number.
         check_in (datetime): The date the guest will check in.
         check_out (datetime): The date the guest will check out.
+        hotel_id (int): The id of the hotel.
     """
 
     def __init__(self, reservation_id):
@@ -42,6 +43,37 @@ class Reservation:
             reservation[2], '%Y-%m-%d %H:%M:%S')
         self.check_out = datetime.datetime.strptime(
             reservation[3], '%Y-%m-%d %H:%M:%S')
+        if reservation[4]:
+            print('null')
+            self.cost = reservation[4]
+        else:
+            self.cost = 0
+
+        self.hotel_id = reservation[5]
+
+        self.edit_cost()
+
+    def edit_cost(self, amount=None, add=False):
+        """ Edits the cost of the reservation.
+
+        """
+        c = self.conn.cursor()
+        # If add is False, we subtract the amount
+        if amount and not add:
+            self.cost -= amount
+        # If add is true, we add (or credit) the user's reservation
+        elif amount and add:
+            self.cost += amount
+        # if amount isn't provided (at the beginning), and add is false (by default) calculate the amount of the reservation.
+        else:
+            query = f'''SELECT * FROM reservation_has_rooms WHERE reservation_id = {self.reservation_id}'''
+            c.execute(query)
+            rooms = c.fetchall()
+            for room in rooms:
+                print(room)
+                self.cost += room[int(2)]
+            print(self.cost)
+            return self.cost
 
     def edit_check_in(self, new_date):
         """ Edits the reservation check in date.

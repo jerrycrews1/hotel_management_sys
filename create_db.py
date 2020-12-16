@@ -8,10 +8,11 @@ def create_db_tables():
     c.execute('''CREATE TABLE hotels (hotel_id INTEGER PRIMARY KEY AUTOINCREMENT, hotel_name TEXT NOT NULL, tax_perc DECIMAL(2, 2))''')
     c.execute(
         '''CREATE TABLE room_types (room_type_id INTEGER PRIMARY KEY, description TEXT)''')
-    c.execute('''CREATE TABLE rooms (room_num INTEGER PRIMARY KEY, room_type_id INTEGER, rate DECIMAL(5, 2), availability INTEGER NULL DEFAULT 1,
+    c.execute('''CREATE TABLE rooms (room_num INTEGER PRIMARY KEY, room_type_id INTEGER, rate DECIMAL(5, 2),
                  FOREIGN KEY (room_type_id) REFERENCES room_types (room_type_id))''')
-    c.execute('''CREATE TABLE reservations (reservation_id INTEGER PRIMARY KEY AUTOINCREMENT, guest_id INTEGER, check_in DATETIME NOT NULL, check_out DATETIME NOT NULL,
-                 FOREIGN KEY (guest_id) REFERENCES guests (guest_id))''')
+    c.execute('''CREATE TABLE reservations (reservation_id INTEGER PRIMARY KEY AUTOINCREMENT, guest_id INTEGER, check_in DATETIME NOT NULL, check_out DATETIME NOT NULL, cost DECIMAL(6, 2), hotel_id INTEGER,
+                 FOREIGN KEY (guest_id) REFERENCES guests (guest_id),
+                 FOREIGN KEY (hotel_id) REFERENCES guests (hotel_id))''')
     c.execute(
         '''CREATE TABLE guests (guest_id INTEGER PRIMARY KEY, phone_number INTEGER UNIQUE NOT NULL, name VARCHAR(50))''')
     c.execute('''CREATE TABLE reservation_has_rooms (reservation_id INTEGER, room_id INTEGER,
@@ -43,7 +44,7 @@ def create_rooms():
         # this changes the king to be more expensive (it has a lower id) and the single to be least expensive.
         rate = (300 // room_type) ^ room_type
         c.execute(
-            'INSERT INTO rooms (room_num, room_type_id, rate, availability) VALUES (?, ?, ?, ?)', (room_number, room_type, rate, 1))
+            'INSERT INTO rooms (room_num, room_type_id, rate) VALUES (?, ?, ?)', (room_number, room_type, rate))
         conn.commit()
 
 
