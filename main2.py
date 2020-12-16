@@ -13,21 +13,32 @@ from room import Room
 from create_db import create_db_tables, create_room_types, create_rooms
 
 
-def create_guest():
-    name = input("Enter the guest's name: ").capitalize()
-    phone_number = input("Enter the guest's phone_number: ")
+def create_guest(name=None, phone_number=None):
+    if not name:
+        name = input("Enter the guest's name: ").capitalize()
+    if not phone_number:
+        phone_number = input("Enter the guest's phone_number: ")
 
     conn = sqlite3.connect('hotel.db')
     c = conn.cursor()
     insert_statement = 'INSERT INTO guests(name, phone_number) VALUES(?, ?)'
     c.execute(insert_statement, (name, phone_number))
     conn.commit()
-
-
-def get_guest():
-    phone_number = int(input('Enter guest\'s phone number >'))
-    guest = Guest(phone_number)
+    c.execute('SELECT * FROM guests ORDER BY guest_id DESC LIMIT 1')
+    guest_phone_number = c.fetchone()[1]
+    guest = Guest(guest_phone_number)
+    print(guest)
     return guest
+
+
+def get_guest(phone_number=None):
+    if not phone_number:
+        phone_number = int(input('Enter guest\'s phone number >'))
+    try:
+        guest = Guest(phone_number)
+        return guest
+    except TypeError:
+        return create_guest(phone_number=phone_number)
 
 
 def edit_guest():
@@ -75,7 +86,14 @@ def get_hotel():
 def create_reservation():
     conn = sqlite3.connect('hotel.db')
     c = conn.cursor()
-    guest = get_guest()
+    phone_number = int(input('Enter guest\'s phone number >'))
+    try:
+        guest = get_guest(phone_number=phone_number)
+        print('try statement')
+    except TypeError:
+        guest = create_guest(phone_number=get_guest())
+        print('except')
+    guest_id = guest.guest_id
     num_rooms = int(
         int(input("Enter how many rooms the guest needs (no more than 5): ")))
     rooms = list()
@@ -96,6 +114,9 @@ def create_reservation():
 
     check_out = (check_in + datetime.timedelta(days=days_staying))
     check_out = check_out.replace(hour=11, minute=00)
+    insert_statement = 'INSERT INTO reservations (guest_id, check_in, check_out) VALUES (?, ?, ?)'
+    c.execute(insert_statement, (guest_id, check_in, check_out))
+    conn.commit()
 
 
 def main():
