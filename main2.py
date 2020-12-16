@@ -33,7 +33,7 @@ def get_available_rooms_by_type(room_type):
 
 def create_guest(name=None, phone_number=None):
     if not name:
-        name = input("Enter the guest's name >").capitalize()
+        name = input("Enter the guest's name >").title()
     if not phone_number:
         phone_number = input("Enter the guest's phone_number >")
 
@@ -173,7 +173,7 @@ def create_reservation():
             continue
         else:
             continue
-
+    print(f'Your reservation has been created, thank you {guest.name}')
     return reservation
 
 

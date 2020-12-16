@@ -42,10 +42,10 @@ def create_rooms():
         room_type = random.randint(1, 4)
         # this changes the king to be more expensive (it has a lower id) and the single to be least expensive.
         rate = (300 // room_type) ^ room_type
-        print(rate, room_type)
         c.execute(
             'INSERT INTO rooms (room_num, room_type_id, rate, availability) VALUES (?, ?, ?, ?)', (room_number, room_type, rate, 1))
         conn.commit()
+
 
 def create_room_types():
     conn = sqlite3.connect('hotel.db')
