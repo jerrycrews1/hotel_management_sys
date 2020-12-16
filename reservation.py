@@ -31,21 +31,35 @@ class Reservation:
         self.check_in = reservation[2]
         self.check_out = reservation[3]
 
-    def check_guest_in(self):
-        """ Checks in the guest to the hotel.
+    def edit_check_in(self, new_date):
+        """ Edits the reservation check in date.
 
         Side Effects:
-            Changes the room object's occupied attribute to True.
+            Changes the check in attribute.
         """
-        pass
+        c = self.conn.cursor()
+        try:
+            c.execute(
+                'UPDATE reservations SET check_in = ? WHERE reservation_id = ?', (
+                    self.reservation_id, new_date))
+            self.check_in = new_date
+        except TypeError:
+            return 'Could not edit the reservation.'
 
-    def check_guest_out(self):
-        """ Checks out the guest from the hotel.
+    def edit_check_out(self, new_date):
+        """ Edits the reservation check in date.
 
         Side Effects:
-            Changes the room object's occupied attribute to False.
+            Changes the check in attribute.
         """
-        pass
+        c = self.conn.cursor()
+        try:
+            c.execute(
+                'UPDATE reservations SET check_out = ? WHERE reservation_id = ?', (
+                    self.reservation_id, new_date))
+            self.check_out = new_date
+        except TypeError:
+            return 'No Reservation with this id found.'
 
     def late_checkout(self, hours):
         """ Gives the guest a late checkout.
