@@ -90,6 +90,9 @@ def get_hotel():
     c = conn.cursor()
     c.execute('SELECT * FROM hotels')
     hotels = c.fetchall()
+    if len(hotels) < 1:
+        print('Sorry, there are no hotels in the system. Please create one now')
+        return create_hotel()
     for index, hotel in enumerate(hotels):
         print(f'{index + 1}: {hotel[1]}')
     hotel_id = int(input('Which hotel do you want to manage? >'))
@@ -298,7 +301,13 @@ def main():
     hotel_thing = input(
         'Which are you doing? \n0. Exit\n1. Managing an Existing Hotel, or \n2. Creating a New Hotel? \n>')
     if int(hotel_thing) == 1:
-        hotel = get_hotel()
+        while True:
+            try:
+                hotel = get_hotel()
+                break
+            except:
+                print('Sorry that wans\'t an option. Please try again.')
+                continue
     elif int(hotel_thing) == 2:
         hotel = create_hotel()
     else:
@@ -314,7 +323,13 @@ def main():
             if int(guest_thing) == 1:
                 create_guest()
             elif int(guest_thing) == 2:
-                guest = get_guest()
+                while True:
+                    try:
+                        guest = get_guest()
+                        break
+                    except TypeError:
+                        print('Sorry, that guest could not be found.')
+                        continue
                 print(f'Name: {guest.name}\nPhone: {guest.phone_number}')
             elif int(guest_thing) == 3:
                 edit_guest()
