@@ -13,7 +13,23 @@ from reservation import Reservation
 from create_db import create_db_tables, create_room_types, create_rooms
 
 
+class ReservationDoesNotExist(Exception):
+    """Raised when a reservation cannot be found."""
+    pass
+
+
 def get_avialable_rooms_by_date(new_check_in, new_check_out, num_rooms=1):
+    """ Checks if a room is available between dates.
+
+    Args:
+        new_check_in (datetime): The newly provided check in date from the user.
+        new_check_out (datetime): The newly provided check out date from the user.
+        num_rooms (int): The number of rooms to check the dates against.
+
+    Returns:
+        (list): A list of all of the rooms available between the dates.
+    """
+
     conn = sqlite3.connect('hotel.db')
     c = conn.cursor()
     query = f'''SELECT room_num FROM rooms WHERE room_num NOT IN (SELECT room_id FROM reservation_has_rooms JOIN reservations USING(reservation_id) WHERE check_in <= '{new_check_in}' OR '{new_check_in}' < check_out OR '{new_check_in}' <= check_in OR '{new_check_in}' < check_out OR check_in <= '{new_check_out}' OR '{new_check_out}' < check_out OR '{new_check_out}' <= check_out OR check_out < '{new_check_out}')'''
@@ -23,6 +39,14 @@ def get_avialable_rooms_by_date(new_check_in, new_check_out, num_rooms=1):
 
 
 def get_available_rooms_by_type(room_type):
+    """ Checks if a room is available by type (king, queen, etc)
+
+    Args:
+        room_type (str): The type of room to check avialability.
+
+    Returns:
+        (list): A list of all of the rooms available of the user provided type.
+    """
     conn = sqlite3.connect('hotel.db')
     c = conn.cursor()
     query = f'''SELECT room_num FROM rooms WHERE room_type_id = (SELECT room_type_id FROM room_types WHERE description = '{room_type}') ;'''
@@ -32,24 +56,41 @@ def get_available_rooms_by_type(room_type):
 
 
 def create_guest(name=None, phone_number=None):
+    """ Creates a new guest.
+
+    Creates a guest object and adds a guest to the database.
+
+    Args:
+        name (str): The guest's name (first and last).
+        phone_number (int): The guest's phone number (2232233219)
+
+    Returns:
+        (obj): A guest object.
+    """
+
     conn = sqlite3.connect('hotel.db')
     c = conn.cursor()
+
     if not name:
         name = input("Enter the guest's name >").title()
     if not phone_number:
         phone_number = input("Enter the guest's phone_number >")
+
     while True:
         # Check if user with that phone number already exists
         try:
+            # If exists, try again.
             get_guest(phone_number)
             print('Guest with this phone number already exists. Please try again.')
             phone_number = input("Enter the guest's phone_number >")
         except TypeError:
+            # else, keep creating the new guest
             break
 
     insert_statement = 'INSERT INTO guests(name, phone_number) VALUES(?, ?)'
     c.execute(insert_statement, (name, phone_number))
     conn.commit()
+
     c.execute('SELECT * FROM guests ORDER BY guest_id DESC LIMIT 1')
     guest_phone_number = c.fetchone()[1]
     guest = Guest(guest_phone_number)
@@ -58,6 +99,14 @@ def create_guest(name=None, phone_number=None):
 
 
 def get_guest(phone_number=None):
+    """ Retrieves a single guest from the DB.
+
+    Args:
+        phone_number (int): The guest's phone number (2232233219)
+
+    Returns:
+        (obj): A guest object.
+    """
     if not phone_number:
         phone_number = int(input('Enter guest\'s phone number >'))
     guest = Guest(phone_number)
@@ -65,6 +114,12 @@ def get_guest(phone_number=None):
 
 
 def edit_guest():
+    """ Edits a guest.
+
+    Prompts the user for which part of the guest they want to edit,
+    the name or phone number.
+
+    """
     guest = get_guest()
     to_edit = int(
         input("What do you want to edit? \n1. Phone Number, \n2. Name\n>"))
@@ -78,6 +133,14 @@ def edit_guest():
 
 
 def create_hotel():
+    """ Creates a new hotel.
+
+    Prompts the user for information about the hotel and creates a
+    hotel object and adds the hotel to the DB.
+
+    Returns:
+        (obj): A hotel object.
+    """
     tax_perc = float(input('Enter the hotel tax percentage (0.1 for 10%) >'))
     name = input("Enter the name of the hotel >")
     conn = sqlite3.connect('hotel.db')
@@ -91,11 +154,19 @@ def create_hotel():
     c.execute('SELECT * FROM hotels ORDER BY hotel_id DESC LIMIT 1')
     hotel_id = c.fetchone()[0]
     hotel = Hotel(hotel_id)
-    print(hotel)
     return hotel
 
 
 def get_hotel():
+    """ Retrieves a hotel from the DB.
+
+    Asks a user which hotel they want to manage by showing a
+    list of hotels from the DB. If no hotel exists, allows a
+    user to create a new hotel.
+
+    Returns:
+        (obj): A hotel object.
+    """
     conn = sqlite3.connect('hotel.db')
     c = conn.cursor()
     c.execute('SELECT * FROM hotels')
@@ -111,10 +182,20 @@ def get_hotel():
 
 
 def create_reservation(hotel_id):
-    ''' Creates a new reservation
+    ''' Creates a new reservation.
+
+    Prompts for the user the reservation will be created for. If no user is found
+    by the phone number provided, the program asks if the user wants to create a
+    new guest from the provided phone number or try again. Checks each room for
+    availability on the provided dates and of the provided room type. If no rooms
+    fit the guest's request, inform them of such and start over. If a reservation
+    is created, add it to the DB.
+
+    Args:
+        hotel_id (int): The id of the hotel the reservation belongs to.
 
     Returns:
-        reservation (obj): A reservation object.
+        (obj): A reservation object.
     '''
     conn = sqlite3.connect('hotel.db')
     c = conn.cursor()
@@ -202,6 +283,19 @@ def create_reservation(hotel_id):
 
 
 def get_reservation(reservation_id, hotel_id):
+    """ Retreives a reservation from the DB.
+
+    Args:
+        reservation_id (int): The id of the reservation.
+        hotel_id (int): The hotel the reservation belongs to.
+
+    Raises:
+        ReservationDoesNotExist: Raised when a reservation with the given information
+                                 cannot be found.
+
+    Returns:
+        (obj): A reservation object.
+    """
     conn = sqlite3.connect('hotel.db')
     c = conn.cursor()
     query = '''SELECT * FROM reservations WHERE reservation_id = ? AND hotel_id = ?'''
@@ -210,10 +304,18 @@ def get_reservation(reservation_id, hotel_id):
         reservation = c.fetchone()
         return reservation
     except TypeError:
-        return 'Sorry, that reservation wasn\'t found'
+        raise ReservationDoesNotExist('Sorry, that reservation wasn\'t found')
 
 
 def get_reservations(hotel_id):
+    """ Retrieves all reservations belonging to a guest from the DB.
+
+    Args:
+        hotel_id (int): The id of the hotel the reservations belong to.
+
+    Returns:
+        (list): A list of reservation objects.
+    """
     conn = sqlite3.connect('hotel.db')
     c = conn.cursor()
     while True:
@@ -223,12 +325,12 @@ def get_reservations(hotel_id):
             get_guest(phone_number=phone_number)
             break
         except TypeError:
-            print('No reservation under that phone number were found.')
+            print('No reservation under that phone number was found.')
             continue
 
     query = 'SELECT * FROM reservations WHERE guest_id = (SELECT guest_id FROM guests WHERE phone_number = ?) AND hotel_id = ?;'
     c.execute(query, (phone_number, hotel_id))
-    # Print the reservations for the specific guests and have them select which reservation by id.
+    # Print the reservations for the specific guest and have them select which reservation by id.
     reservations = c.fetchall()
     for reservation in reservations:
         print(
@@ -237,13 +339,25 @@ def get_reservations(hotel_id):
 
 
 def edit_reservation(hotel_id):
+    """ Edits a reservation.
+
+    Args:
+        hotel_id (int): The id of the hotel the reservation belongs to.
+
+    Raises:
+        ReservationDoesNotExist: Returns if the reservation can not be found.
+
+    Returns:
+        (obj): A reservation object.
+    """
     get_reservations(hotel_id)
     reservation_id = int(input('Which reservation do you want to manage? >'))
     try:
         reservation = get_reservation(reservation_id, hotel_id)
         reservation = Reservation(reservation[0])
     except TypeError:
-        print('Sorry that reservation could not be found.')
+        raise ReservationDoesNotExist(
+            'Sorry that reservation could not be found.')
     reservation_edit = int(input(
         'Which part of the reservation do you want to edit?\n1. Check In Date, \n2. Check Out Date, \n3. Early Check In \n4. Late Check Out\n5. Cancel Reservation\n>'))
     if reservation_edit == 1:
@@ -282,9 +396,25 @@ def edit_reservation(hotel_id):
                 break
             except:
                 continue
+    return reservation
 
 
 def cancel_reservation(hotel_id):
+    """ Cancels a reservation.
+
+    Determines which reservation to cancel and deletes it from the DB.
+    Creates a new entry into the cancellations table upon deletion.
+
+    Args:
+        hotel_id (int): The id of the hotel the reservation belongs to.
+
+    Raises:
+        ReservationDoesNotExist: Returns if the reservation can not be found.
+
+    Returns:
+        (bool): True if reservation deleted.
+    """
+
     conn = sqlite3.connect('hotel.db')
     c = conn.cursor()
     while True:
@@ -305,13 +435,20 @@ def cancel_reservation(hotel_id):
             conn.commit()
             break
         except TypeError:
-            print('Sorry that reservation could not be found.')
-            continue
+            raise ReservationDoesNotExist(
+                'Sorry that reservation could not be found.')
     print('Reservation deleted')
-    return
+    return True
 
 
 def main():
+    """ Runs the program.
+
+    Asks the user which options they would like to perform and then 
+    runs those specific functions. Can also create the db and add to 
+    the tables.
+
+    """
     # create_db_tables()
     # create_room_types()
     # create_rooms()
