@@ -483,9 +483,9 @@ def main():
     the tables.
 
     """
-    # create_db_tables()
-    # create_room_types()
-    # create_rooms()
+    # create_db_tables('hotel.db')
+    # create_room_types('hotel.db')
+    # create_rooms('hotel.db')
     print('Welcome to the Hotel Management System.')
     hotel_thing = input(
         'Which are you doing? \n0. Exit\n1. Managing an Existing Hotel, or \n2. Creating a New Hotel? \n>')

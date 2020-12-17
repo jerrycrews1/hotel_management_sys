@@ -2,8 +2,8 @@ import sqlite3
 import random
 
 
-def create_db_tables():
-    conn = sqlite3.connect('hotel.db')
+def create_db_tables(db_name):
+    conn = sqlite3.connect(db_name)
     c = conn.cursor()
     c.execute('''CREATE TABLE hotels (hotel_id INTEGER PRIMARY KEY AUTOINCREMENT, hotel_name TEXT NOT NULL, tax_perc DECIMAL(2, 2))''')
     c.execute(
@@ -24,8 +24,8 @@ def create_db_tables():
                  FOREIGN KEY (guest_id) REFERENCES guests (guest_id))''')
 
 
-def create_rooms():
-    conn = sqlite3.connect('hotel.db')
+def create_rooms(db_name):
+    conn = sqlite3.connect(db_name)
     c = conn.cursor()
     c.execute('DELETE FROM rooms')
     conn.commit()
@@ -48,8 +48,8 @@ def create_rooms():
         conn.commit()
 
 
-def create_room_types():
-    conn = sqlite3.connect('hotel.db')
+def create_room_types(db_name):
+    conn = sqlite3.connect(db_name)
     c = conn.cursor()
     c.execute('''INSERT INTO room_types (description) VALUES ('king')''')
     c.execute('''INSERT INTO room_types (description) VALUES ('queen')''')
