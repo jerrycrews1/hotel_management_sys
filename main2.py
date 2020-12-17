@@ -32,19 +32,28 @@ def get_available_rooms_by_type(room_type):
 
 
 def create_guest(name=None, phone_number=None):
+    conn = sqlite3.connect('hotel.db')
+    c = conn.cursor()
     if not name:
         name = input("Enter the guest's name >").title()
     if not phone_number:
         phone_number = input("Enter the guest's phone_number >")
+    while True:
+        # Check if user with that phone number already exists
+        try:
+            get_guest(phone_number)
+            print('Guest with this phone number already exists. Please try again.')
+            phone_number = input("Enter the guest's phone_number >")
+        except TypeError:
+            break
 
-    conn = sqlite3.connect('hotel.db')
-    c = conn.cursor()
     insert_statement = 'INSERT INTO guests(name, phone_number) VALUES(?, ?)'
     c.execute(insert_statement, (name, phone_number))
     conn.commit()
     c.execute('SELECT * FROM guests ORDER BY guest_id DESC LIMIT 1')
     guest_phone_number = c.fetchone()[1]
     guest = Guest(guest_phone_number)
+    print('Guest created successfully.')
     return guest
 
 
@@ -61,6 +70,7 @@ def edit_guest():
         input("What do you want to edit? \n1. Phone Number, \n2. Name\n>"))
     if to_edit == 1:
         new_number = input("Please enter a new phone number (3323449506) >")
+        # NEED TO CHECK IF NEW PHONE NUMBER ALREADY EXISTS
         guest.edit_phone_number(new_number)
     elif to_edit == 2:
         new_name = input("Please enter a new name >")
@@ -108,13 +118,21 @@ def create_reservation(hotel_id):
     '''
     conn = sqlite3.connect('hotel.db')
     c = conn.cursor()
-    phone_number = int(input('Enter guest\'s phone number >'))
-    try:
-        # If the guest doesn't already exist, move to the except statement.
-        guest = get_guest(phone_number=phone_number)
-    except TypeError:
-        # Create a new guest from the phone_number already entered.
-        guest = create_guest(phone_number=phone_number)
+    while True:
+        phone_number = int(input('Enter guest\'s phone number >'))
+        try:
+            # If the guest doesn't already exist, move to the except statement.
+            guest = get_guest(phone_number=phone_number)
+            break
+        except TypeError:
+            new_guest_thing = int(input(
+                f'That guest doesn\'t exists. Would you like to create a new guest using the phone number you entered: {phone_number}?\n 1. Yes\n2. No(use different phone number)\n>'))
+            if new_guest_thing == 1:
+                # Create a new guest from the phone_number already entered.
+                guest = create_guest(phone_number=phone_number)
+                break
+            elif new_guest_thing == 2:
+                continue
     guest_id = guest.guest_id
 
     while True:
