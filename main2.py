@@ -18,6 +18,11 @@ class ReservationDoesNotExist(Exception):
     pass
 
 
+class RoomNotAvailable(Exception):
+    """Raised when a room isn't available."""
+    pass
+
+
 def get_avialable_rooms_by_date(new_check_in, new_check_out, num_rooms=1):
     """ Checks if a room is available between dates.
 
@@ -25,6 +30,9 @@ def get_avialable_rooms_by_date(new_check_in, new_check_out, num_rooms=1):
         new_check_in (datetime): The newly provided check in date from the user.
         new_check_out (datetime): The newly provided check out date from the user.
         num_rooms (int): The number of rooms to check the dates against.
+
+    Raises:
+        RoomNotAvailable: If no rooms are available matching the types.
 
     Returns:
         (list): A list of all of the rooms available between the dates.
@@ -35,6 +43,9 @@ def get_avialable_rooms_by_date(new_check_in, new_check_out, num_rooms=1):
     query = f'''SELECT room_num FROM rooms WHERE room_num NOT IN (SELECT room_id FROM reservation_has_rooms JOIN reservations USING(reservation_id) WHERE check_in <= '{new_check_in}' OR '{new_check_in}' < check_out OR '{new_check_in}' <= check_in OR '{new_check_in}' < check_out OR check_in <= '{new_check_out}' OR '{new_check_out}' < check_out OR '{new_check_out}' <= check_out OR check_out < '{new_check_out}')'''
     c.execute(query)
     rooms_available = c.fetchall()
+    if len(rooms_available) == 0:
+        raise RoomNotAvailable(
+            'Sorry! Those rooms aren\'t available on those dates.')
     return rooms_available
 
 
@@ -44,6 +55,9 @@ def get_available_rooms_by_type(room_type):
     Args:
         room_type (str): The type of room to check avialability.
 
+    Raises:
+        RoomNotAvailable: If no rooms are available matching the types.
+
     Returns:
         (list): A list of all of the rooms available of the user provided type.
     """
@@ -52,6 +66,9 @@ def get_available_rooms_by_type(room_type):
     query = f'''SELECT room_num FROM rooms WHERE room_type_id = (SELECT room_type_id FROM room_types WHERE description = '{room_type}') ;'''
     c.execute(query)
     rooms_available = c.fetchall()
+    if len(rooms_available) == 0:
+        raise RoomNotAvailable(
+            'Sorry! Those rooms aren\'t available of that type.')
     return rooms_available
 
 
@@ -231,21 +248,30 @@ def create_reservation(hotel_id):
 
         rooms = list()
         # Get the rooms that are available on those dates
-        rooms_avialable_on_dates = get_avialable_rooms_by_date(
-            check_in, check_out, num_rooms)
+        try:
+            rooms_avialable_on_dates = get_avialable_rooms_by_date(
+                check_in, check_out, num_rooms)
+        except RoomNotAvailable:
+            print('Sorry! That many rooms aren\'t available for those dates.')
+            continue
+
         # If there are rooms, proceed.
+        # Loop through each room the user wants and check if the type is available.
         if len(rooms_avialable_on_dates) >= num_rooms:
-            # Loop through each room the user wants and check if the type is available.
             for room in range(num_rooms):
                 while True:
                     room_type = input(
                         f"Enter the type of room #{room + 1} the guest wants (king, queen, double, single) >").casefold()
                     # Get the rooms that are availabe of this type
-                    rooms_avialable_by_type = get_available_rooms_by_type(
-                        room_type)
+                    try:
+                        rooms_avialable_by_type = get_available_rooms_by_type(
+                            room_type)
+                    except RoomNotAvailable:
+                        print('Sorry! A room of that type isn\'t available.')
+                        continue
                     # Make a set of rooms which are available on those dates AND by that type
                     rooms = (set(rooms_avialable_on_dates) &
-                             set(rooms_avialable_by_type))
+                                set(rooms_avialable_by_type))
                     # If there are rooms, proceed, else try again.
                     if len(rooms) > 0:
                         break
@@ -254,21 +280,21 @@ def create_reservation(hotel_id):
                             'Sorry there are no available rooms of that type on the dates you entered.')
                         continue
 
-            # Add the reservation to the db
+            # Add the reservation to the DB
             insert_statement = 'INSERT INTO reservations (guest_id, check_in, check_out, hotel_id) VALUES (?, ?, ?, ?)'
             c.execute(insert_statement, (guest_id,
-                                         check_in, check_out, hotel_id))
+                                            check_in, check_out, hotel_id))
             conn.commit()
-            # Get the reservation back from the db
+            # Get the reservation back from the DB
             c.execute(
                 f'''SELECT * FROM reservations WHERE hotel_id = {hotel_id} ORDER BY reservation_id  DESC LIMIT 1''')
             reservation_id = c.fetchone()[0]
-            # Loop through each room the user wants and add it to the reservation_has_rooms table in the db.
+            # Loop through each room the user wants and add it to the reservation_has_rooms table in the DB.
             rooms = list(rooms)[-num_rooms:]
             for room in rooms:
                 res_to_rooms_insert = 'INSERT INTO reservation_has_rooms VALUES (?, ?)'
                 c.execute(res_to_rooms_insert,
-                          (reservation_id, room[0]))
+                            (reservation_id, room[0]))
             conn.commit()
             reservation = Reservation(reservation_id)
             break
@@ -276,6 +302,7 @@ def create_reservation(hotel_id):
             print("Sorry! Those rooms aren't available for those dates.")
             continue
         else:
+            print('else')
             continue
     print(
         f'Your reservation has been created, thank you {guest.name}. The cost is ${reservation.cost}.')
@@ -437,7 +464,7 @@ def cancel_reservation(hotel_id):
         except TypeError:
             raise ReservationDoesNotExist(
                 'Sorry that reservation could not be found.')
-    print('Reservation deleted')
+    print('Reservation deleted successfully.')
     return True
 
 

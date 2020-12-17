@@ -100,6 +100,7 @@ class Reservation:
                   (new_check_in, self.reservation_id))
         self.conn.commit()
         self.check_in = new_check_in
+        self.edit_cost()
 
     def edit_check_out(self, new_date):
         """ Edits the reservation check in date.
@@ -130,6 +131,7 @@ class Reservation:
         c.execute(
             'UPDATE reservations SET check_out = ? WHERE reservation_id = ?', (
                 new_date, self.reservation_id))
+        self.edit_cost()
 
     def late_checkout(self, hours):
         """ Gives the guest a late checkout.
