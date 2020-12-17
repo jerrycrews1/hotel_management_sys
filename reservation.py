@@ -1,6 +1,5 @@
 import sqlite3
 import datetime
-from datetime import date
 
 
 class EarlyCheckInError(Exception):

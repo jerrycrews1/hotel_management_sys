@@ -6,7 +6,7 @@ necessary for operating a hotel.
 import sys
 import datetime
 import sqlite3
-from room import Room
+# from room import Room
 from guest import Guest
 from hotel import Hotel
 from reservation import Reservation
@@ -112,6 +112,7 @@ def create_guest(name=None, phone_number=None):
     guest_phone_number = c.fetchone()[1]
     guest = Guest(guest_phone_number)
     print('Guest created successfully.')
+    input("Press Enter to continue...")
     return guest
 
 
@@ -171,6 +172,8 @@ def create_hotel():
     c.execute('SELECT * FROM hotels ORDER BY hotel_id DESC LIMIT 1')
     hotel_id = c.fetchone()[0]
     hotel = Hotel(hotel_id)
+    print('Hotel created successfully.')
+    input("Press Enter to continue...")
     return hotel
 
 
@@ -232,19 +235,20 @@ def create_reservation(hotel_id):
             elif new_guest_thing == 2:
                 continue
     guest_id = guest.guest_id
+    print(f'Creating reservation for {guest.name}.')
 
     while True:
         # Get the user's check_in date, change to a datetime
-        check_in = input('Enter your check in date (Jun 10 2020): ')
+        check_in = input('Check in date? (Jun 10 2020): ')
         check_in = datetime.datetime.strptime(check_in, '%b %d %Y')
         check_in = check_in.replace(hour=13, minute=00)
         # Get the number of days stating and create the check_out datetime from that
-        days_staying = int(input("Enter how many days the guest be staying >"))
+        days_staying = int(input("How many nights? >"))
         check_out = (check_in + datetime.timedelta(days=days_staying))
         check_out = check_out.replace(hour=11, minute=00)
 
         num_rooms = int(
-            int(input("Enter how many rooms the guest needs (no more than 5) >")))
+            int(input("How many rooms? >")))
 
         rooms = list()
         # Get the rooms that are available on those dates
@@ -261,7 +265,7 @@ def create_reservation(hotel_id):
             for room in range(num_rooms):
                 while True:
                     room_type = input(
-                        f"Enter the type of room #{room + 1} the guest wants (king, queen, double, single) >").casefold()
+                        f"Room type for room #{room + 1}? (king, queen, double, single) >").casefold()
                     # Get the rooms that are availabe of this type
                     try:
                         rooms_avialable_by_type = get_available_rooms_by_type(
@@ -271,7 +275,7 @@ def create_reservation(hotel_id):
                         continue
                     # Make a set of rooms which are available on those dates AND by that type
                     rooms = (set(rooms_avialable_on_dates) &
-                                set(rooms_avialable_by_type))
+                             set(rooms_avialable_by_type))
                     # If there are rooms, proceed, else try again.
                     if len(rooms) > 0:
                         break
@@ -283,7 +287,7 @@ def create_reservation(hotel_id):
             # Add the reservation to the DB
             insert_statement = 'INSERT INTO reservations (guest_id, check_in, check_out, hotel_id) VALUES (?, ?, ?, ?)'
             c.execute(insert_statement, (guest_id,
-                                            check_in, check_out, hotel_id))
+                                         check_in, check_out, hotel_id))
             conn.commit()
             # Get the reservation back from the DB
             c.execute(
@@ -294,7 +298,7 @@ def create_reservation(hotel_id):
             for room in rooms:
                 res_to_rooms_insert = 'INSERT INTO reservation_has_rooms VALUES (?, ?)'
                 c.execute(res_to_rooms_insert,
-                            (reservation_id, room[0]))
+                          (reservation_id, room[0]))
             conn.commit()
             reservation = Reservation(reservation_id)
             break
@@ -302,10 +306,10 @@ def create_reservation(hotel_id):
             print("Sorry! Those rooms aren't available for those dates.")
             continue
         else:
-            print('else')
             continue
     print(
         f'Your reservation has been created, thank you {guest.name}. The cost is ${reservation.cost}.')
+    input("Press Enter to continue...")
     return reservation
 
 
@@ -408,6 +412,7 @@ def edit_reservation(hotel_id):
             try:
                 reservation.early_checkin(hours)
                 print('Your early check in has been approved.')
+                input("Press Enter to continue...")
                 break
             except:
                 continue
@@ -420,6 +425,7 @@ def edit_reservation(hotel_id):
             try:
                 reservation.late_checkout(hours)
                 print('Your late check out has been approved.')
+                input("Press Enter to continue...")
                 break
             except:
                 continue
@@ -465,6 +471,7 @@ def cancel_reservation(hotel_id):
             raise ReservationDoesNotExist(
                 'Sorry that reservation could not be found.')
     print('Reservation deleted successfully.')
+    input("Press Enter to continue...")
     return True
 
 
@@ -513,6 +520,7 @@ def main():
                         print('Sorry, that guest could not be found.')
                         continue
                 print(f'Name: {guest.name}\nPhone: {guest.phone_number}')
+                input("Press Enter to continue...")
             elif int(guest_thing) == 3:
                 edit_guest()
             else:
