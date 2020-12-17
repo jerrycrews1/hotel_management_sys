@@ -28,9 +28,11 @@ class Reservation:
     def __init__(self, reservation_id):
         """ Initializes a Reservation object.
 
+        Creates a reservation object from the reservation table in the DB.
+
         Side Effects:
-            Sets the hotel, rooms, guest, check_in, and the check_out attributes
-            and connects to the reservation's table in the sqlite database.
+            Sets the reservation_id, guest_id, check_in, check_out, cost, and the hotel_id attributes
+            and calculates the cost of the reservation.
         """
         self.conn = sqlite3.connect('hotel.db')
         c = self.conn.cursor()
@@ -47,10 +49,25 @@ class Reservation:
         self.cost = float(reservation[4])
         self.hotel_id = reservation[5]
 
+        # get the initial cost of the reservation upon creation.
         self.edit_cost()
 
     def edit_cost(self, amount=None, add=False):
         """ Edits the cost of the reservation.
+
+        Goes through the rooms in the reservation and calculates the
+        cost by the rate * the number of days of the reservation. 
+
+        Args:
+            amount (float): the amount to change the cost by.
+            add (bool): Whether to credit the account or not. 
+
+        Side Effects:
+            Updates the cost attribute and updates the cost of the
+            reservaiton in the DB.
+
+        Returns:
+            (float): The new cost of the reservation
 
         """
         c = self.conn.cursor()
@@ -78,8 +95,14 @@ class Reservation:
     def edit_check_in(self, new_date):
         """ Edits the reservation check in date.
 
+        Args:
+            new_date (datetime): the new check in date.
+
         Side Effects:
-            Changes the check in attribute.
+            Changes the check in attribute and updates the check in
+            element in the DB. Finally, it updates the cost of the
+            reservation by calling the edit_cost method.
+
         """
         c = self.conn.cursor()
         # Get all rooms in the reservation.
@@ -105,8 +128,14 @@ class Reservation:
     def edit_check_out(self, new_date):
         """ Edits the reservation check in date.
 
+        Args:
+            new_date (datetime): the new check out date.
+
         Side Effects:
-            Changes the check in attribute.
+            Changes the check out attribute and updates the check out
+            element in the DB. Finally, it updates the cost of the
+            reservation by calling the edit_cost method.
+
         """
         c = self.conn.cursor()
         # Get all rooms in the reservation.
@@ -127,6 +156,7 @@ class Reservation:
                   (new_check_out, self.reservation_id))
         self.conn.commit()
         self.check_out = new_check_out
+        self.edit_cost()
 
         c.execute(
             'UPDATE reservations SET check_out = ? WHERE reservation_id = ?', (
@@ -134,16 +164,22 @@ class Reservation:
         self.edit_cost()
 
     def late_checkout(self, hours):
-        """ Gives the guest a late checkout.
+        """ Gives the guest a late check out.
 
-        This method checks if the guest already has a late checkout
-        and if they don't, adds the hours to the checkout time.
+        Checks if giving the guest a late check out will interfere with
+        another guest's reservation and updates the check out element of
+        the reservation in the DB.
 
         Args:
-            hours(int): The number of hours to add to the checkout time.
+            hours(int): The number of hours to add to the check out time.
 
         Side Effects:
-            Modifies the check_out attribute by adding the hours to it.
+            Modifies the check_out attribute by adding the hours to it and
+            updates the check out time in the DB.
+
+        Raises:
+            EarlyCheckOutError: Raises if an early check out would interefere
+                                with another guest's reservations.
         """
         c = self.conn.cursor()
         # Get all rooms in the reservation.
@@ -167,17 +203,22 @@ class Reservation:
         self.check_out = new_check_out
 
     def early_checkin(self, hours):
-        """ Gives the guest an early checkin.
+        """ Gives the guest a early check in.
 
-        This method checks if an early checkin has already been given.  It then
-        checks to ensure that giving an early checkin doesn't interfere with another
-        reservation.
+        Checks if giving the guest an early check in will interfere with
+        another guest's reservation and updates the check in element of
+        the reservation in the DB.
 
         Args:
-            hours(int): The number of hours to subtract from the checkin time.
+            hours(int): The number of hours to subtract from the check in time.
 
         Side Effects:
-            Modifies the check_in attribute by stubtracting hours from it.
+            Modifies the check_in attribute by subtracting the hours from it and
+            updates the check in time in the DB.
+
+        Raises:
+            EarlyCheckOutError: Raises if an early check out would interefere
+                                with another guest's reservations.
         """
         c = self.conn.cursor()
         # Get all rooms in the reservation.
