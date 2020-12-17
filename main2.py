@@ -126,7 +126,7 @@ def create_reservation(hotel_id):
             break
         except TypeError:
             new_guest_thing = int(input(
-                f'That guest doesn\'t exists. Would you like to create a new guest using the phone number you entered: {phone_number}?\n 1. Yes\n2. No(use different phone number)\n>'))
+                f'That guest doesn\'t exists. Would you like to create a new guest using the phone number you entered: {phone_number}?\n1. Yes\n2. No(use different phone number)\n>'))
             if new_guest_thing == 1:
                 # Create a new guest from the phone_number already entered.
                 guest = create_guest(phone_number=phone_number)
