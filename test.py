@@ -22,6 +22,7 @@ def setup_db():
 
 @pytest.fixture
 def setup_test_guests(setup_db):
+    """ Fixture to enter 4 guest into the database. """
     conn = setup_db
     c = conn.cursor()
     sample_guests = [
@@ -42,5 +43,3 @@ def test_entering_guest_in_db(setup_test_guests):
     c.execute('SELECT * FROM guests')
     guests = c.fetchall()
     assert len(guests) == 4
-
-

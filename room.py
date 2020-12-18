@@ -29,4 +29,3 @@ class Room:
         self.room_number = room[0]
         self.room_type_id = room[1]
         self.rate = room[2]
-        self.availability = room[3]

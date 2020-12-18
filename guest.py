@@ -10,18 +10,19 @@ class Guest:
         name (str): The guest's name.
     """
 
-    def __init__(self, phone_number):
+    def __init__(self, phone_number, database):
         """ Creates a guest object from the database.
 
         Args:
-
             phone_number (str): The guest's phone number.
+            database (str): The database to connect to.
 
         Side Effects:
             Sets the guest_id, name, and phone_number attributes.
         """
 
-        self.conn = sqlite3.connect('hotel.db')
+        print(database)
+        self.conn = sqlite3.connect(database)
         c = self.conn.cursor()
         c.execute('SELECT * FROM guests WHERE phone_number = ?',
                   (phone_number, ))

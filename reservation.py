@@ -24,16 +24,20 @@ class Reservation:
         hotel_id (int): The id of the hotel.
     """
 
-    def __init__(self, reservation_id):
+    def __init__(self, reservation_id, database):
         """ Initializes a Reservation object.
 
         Creates a reservation object from the reservation table in the DB.
+
+        Args:
+            reservation_id (int): The reservation id.
+            database (str): The DB to connect to.
 
         Side Effects:
             Sets the reservation_id, guest_id, check_in, check_out, cost, and the hotel_id attributes
             and calculates the cost of the reservation.
         """
-        self.conn = sqlite3.connect('hotel.db')
+        self.conn = sqlite3.connect(database)
         c = self.conn.cursor()
         c.execute('SELECT * FROM reservations WHERE reservation_id = ?',
                   (reservation_id, ))
