@@ -45,8 +45,9 @@ def test_entering_guest_in_db(setup_test_guests):
     assert len(guests) == 4
 
 def test_create_rooms():
+    """ Test for the creation of exactly 101 rooms in the DB. """
     conn = sqlite3.connect('test.db')
     c = conn.cursor()
     c.execute ('SELECT COUNT(*) FROM rooms')
     num_of_rooms = c.fetchall()
-    assert num_of_rooms[0][0] == 101
+    assert num_of_rooms[0][0] == 100
