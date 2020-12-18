@@ -188,7 +188,7 @@ def edit_guest(database):
         guest.edit_name(new_name)
 
 
-def create_hotel():
+def create_hotel(database):
     """ Creates a new hotel.
 
     Prompts the user for information about the hotel and creates a
@@ -197,9 +197,16 @@ def create_hotel():
     Returns:
         (obj): A hotel object.
     """
-    tax_perc = float(input('Enter the hotel tax percentage (0.1 for 10%) >'))
+    while True:
+        tax_perc = input('Enter the hotel tax percentage (0.1 for 10%) >')
+        try:
+            tax_perc = float(tax_perc)
+            break
+        except ValueError:
+            print('Sorry, that wasn\'t what we were looking for.')
+            continue
     name = input("Enter the name of the hotel >")
-    conn = sqlite3.connect('hotel.db')
+    conn = sqlite3.connect(database)
     c = conn.cursor()
 
     insert_statement = (
@@ -215,7 +222,7 @@ def create_hotel():
     return hotel
 
 
-def get_hotel():
+def get_hotel(database):
     """ Retrieves a hotel from the DB.
 
     Asks a user which hotel they want to manage by showing a
@@ -231,7 +238,7 @@ def get_hotel():
     hotels = c.fetchall()
     if len(hotels) < 1:
         print('Sorry, there are no hotels in the system. Please create one now')
-        return create_hotel()
+        return create_hotel(database)
     for index, hotel in enumerate(hotels):
         print(f'{index + 1}: {hotel[1]}')
     hotel_id = int(input('Which hotel do you want to manage? >'))
@@ -429,7 +436,7 @@ def edit_reservation(hotel_id, database):
     """
     _, options = get_reservations(hotel_id, database)
     while True:
-        
+
         try:
             user_choice = int(
                 input('Which reservation do you want to manage? >'))
@@ -515,7 +522,7 @@ def cancel_reservation(hotel_id, database):
     c = conn.cursor()
     _, options = get_reservations(hotel_id, database)
     while True:
-        
+
         try:
             user_choice = int(
                 input('Which reservation do you want to manage? >'))
@@ -569,13 +576,13 @@ def main():
     if hotel_thing == 1:
         while True:
             try:
-                hotel = get_hotel()
+                hotel = get_hotel(database)
                 break
             except:
                 print('Sorry that wans\'t an option. Please try again.')
                 continue
     elif hotel_thing == 2:
-        hotel = create_hotel()
+        hotel = create_hotel(database)
     else:
         return
     hotel_id = hotel.hotel_id
