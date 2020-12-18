@@ -365,7 +365,7 @@ def get_reservations(hotel_id):
     reservations = c.fetchall()
     for reservation in reservations:
         print(
-            f'{reservation[0]}: Check In: {reservation[2]} Check Out {reservation[3]}')
+            f'{reservation[0]}: Check In: {reservation[2]} Check Out {reservation[3]} Amount: ${reservation[4]}')
     return reservations
 
 
@@ -505,7 +505,7 @@ def main():
     print(f'We are managing the {hotel.name} hotel.')
     while True:
         thing = input(
-            'What do you want to do? \n0. Back\n1. Manage Guest \n2. Manage Reservation \n3. OTHER (TBD) \n>')
+            'What do you want to do? \n0. Back\n1. Manage Guest \n2. Manage Reservation\n>')
         if int(thing) == 1:
             guest_thing = input(
                 'What do you want to do? \n0. Back\n1. Create Guest, \n2. Retrieve Guest \n3. Edit Guest Information \n>')
@@ -538,8 +538,6 @@ def main():
                 cancel_reservation(hotel_id)
             else:
                 break
-        elif int(thing) == 3:
-            pass
         else:
             break
 
