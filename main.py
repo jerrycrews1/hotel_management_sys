@@ -27,11 +27,36 @@ def get_phone_number():
     """ Prompts the user for a phone number until a 10 digit number is entered.
     """
     while True:
-        phone_number = input("Enter the guest's phone_number >")
-        if len(phone_number) == 10:
+        try:
+            phone_number = input("Enter the guest's phone_number >")
+            if len(str(phone_number)) != 10:
+                raise ValueError
+            type(int(phone_number)) == int
             return phone_number
-        else:
+        except (ValueError, TypeError):
             print('The phone number must be exactly 10 digits. Please try again.')
+            continue
+
+
+def get_user_options(input_statement):
+    """ Get's the user's input for the console interaction of 1 digit entries.
+
+    Args:
+        input_statement (str): The input readout to prompt the user.
+
+    Returns:
+        (int): The user's response to the input.
+    """
+
+    while True:
+        try:
+            response = int(input(input_statement))
+            len(str(response)) == 1
+            type(response) == int
+            return response
+        except (ValueError, TypeError):
+            print('Sorry, please enter a valid option.')
+            input('Press enter to continue...')
             continue
 
 
@@ -39,9 +64,9 @@ def get_avialable_rooms_by_date(new_check_in, new_check_out, num_rooms=1):
     """ Checks if a room is available between dates.
 
     Args:
-        new_check_in (datetime): The newly provided check in date from the user.
-        new_check_out (datetime): The newly provided check out date from the user.
-        num_rooms (int): The number of rooms to check the dates against.
+        new_check_in(datetime): The newly provided check in date from the user.
+        new_check_out(datetime): The newly provided check out date from the user.
+        num_rooms(int): The number of rooms to check the dates against.
 
     Raises:
         RoomNotAvailable: If no rooms are available matching the types.
@@ -62,10 +87,10 @@ def get_avialable_rooms_by_date(new_check_in, new_check_out, num_rooms=1):
 
 
 def get_available_rooms_by_type(room_type):
-    """ Checks if a room is available by type (king, queen, etc)
+    """ Checks if a room is available by type(king, queen, etc)
 
     Args:
-        room_type (str): The type of room to check avialability.
+        room_type(str): The type of room to check avialability.
 
     Raises:
         RoomNotAvailable: If no rooms are available matching the types.
@@ -90,9 +115,9 @@ def create_guest(database, name=None, phone_number=None):
     Creates a guest object and adds a guest to the database.
 
     Args:
-        name (str): The guest's name (first and last).
-        phone_number (int): The guest's phone number (2232233219).
-        database (str): The database to connect to.
+        name(str): The guest's name(first and last).
+        phone_number(int): The guest's phone number(2232233219).
+        database(str): The database to connect to.
 
     Returns:
         (obj): A guest object.
@@ -133,7 +158,7 @@ def get_guest(database, phone_number=None):
     """ Retrieves a single guest from the DB.
 
     Args:
-        phone_number (int): The guest's phone number (2232233219)
+        phone_number(int): The guest's phone number(2232233219)
 
     Returns:
         (obj): A guest object.
@@ -331,9 +356,9 @@ def get_reservation(reservation_id, hotel_id, database):
     """ Retreives a reservation from the DB.
 
     Args:
-        reservation_id (int): The id of the reservation.
-        hotel_id (int): The hotel the reservation belongs to.
-        database (str): The database to connect to.
+        reservation_id(int): The id of the reservation.
+        hotel_id(int): The hotel the reservation belongs to.
+        database(str): The database to connect to.
 
     Raises:
         ReservationDoesNotExist: Raised when a reservation with the given information
@@ -357,8 +382,8 @@ def get_reservations(hotel_id, database):
     """ Retrieves all reservations belonging to a guest from the DB.
 
     Args:
-        hotel_id (int): The id of the hotel the reservations belong to.
-        database (str): The database to connect to.
+        hotel_id(int): The id of the hotel the reservations belong to.
+        database(str): The database to connect to.
 
     Returns:
         (list): A list of reservation objects.
@@ -389,8 +414,8 @@ def edit_reservation(hotel_id, database):
     """ Edits a reservation.
 
     Args:
-        hotel_id (int): The id of the hotel the reservation belongs to.
-        database (str): The database to connect to.
+        hotel_id(int): The id of the hotel the reservation belongs to.
+        database(str): The database to connect to.
 
     Raises:
         ReservationDoesNotExist: Returns if the reservation can not be found.
@@ -456,8 +481,8 @@ def cancel_reservation(hotel_id, database):
     Creates a new entry into the cancellations table upon deletion.
 
     Args:
-        hotel_id (int): The id of the hotel the reservation belongs to.
-        database (str): The database to connect to.
+        hotel_id(int): The id of the hotel the reservation belongs to.
+        database(str): The database to connect to.
 
     Raises:
         ReservationDoesNotExist: Returns if the reservation can not be found.
@@ -496,8 +521,8 @@ def cancel_reservation(hotel_id, database):
 def main():
     """ Runs the program.
 
-    Asks the user which options they would like to perform and then 
-    runs those specific functions. Can also create the db and add to 
+    Asks the user which options they would like to perform and then
+    runs those specific functions. Can also create the db and add to
     the tables.
 
     """
@@ -506,9 +531,9 @@ def main():
     # create_rooms('hotel.db')
     database = 'hotel.db'
     print('Welcome to the Hotel Management System.')
-    hotel_thing = input(
+    hotel_thing = get_user_options(
         'Which are you doing? \n0. Exit\n1. Managing an Existing Hotel, or \n2. Creating a New Hotel? \n>')
-    if int(hotel_thing) == 1:
+    if hotel_thing == 1:
         while True:
             try:
                 hotel = get_hotel()
@@ -516,20 +541,19 @@ def main():
             except:
                 print('Sorry that wans\'t an option. Please try again.')
                 continue
-    elif int(hotel_thing) == 2:
+    elif hotel_thing == 2:
         hotel = create_hotel()
     else:
         return
     hotel_id = hotel.hotel_id
     print(f'We are managing the {hotel.name} hotel.')
     while True:
-        thing = input(
+        thing = get_user_options(
             'What do you want to do? \n0. Back\n1. Manage Guest \n2. Manage Reservation\n>')
         if int(thing) == 1:
-            guest_thing = input(
+            guest_thing = get_user_options(
                 'What do you want to do? \n0. Back\n1. Create Guest, \n2. Retrieve Guest \n3. Edit Guest Information \n>')
             if int(guest_thing) == 1:
-                print(database)
                 create_guest(database)
             elif int(guest_thing) == 2:
                 while True:
@@ -546,7 +570,7 @@ def main():
             else:
                 continue
         elif int(thing) == 2:
-            reservation_thing = input(
+            reservation_thing = get_user_options(
                 'What do you want to do? \n0. Back\n1. New Reservation, \n2. View Reservation, \n3. Edit An Existing Reservation, \n4. Cancel Reservation\n>')
             if int(reservation_thing) == 1:
                 create_reservation(hotel_id, database)
