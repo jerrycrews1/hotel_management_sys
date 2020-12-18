@@ -424,7 +424,14 @@ def edit_reservation(hotel_id, database):
         (obj): A reservation object.
     """
     get_reservations(hotel_id, database)
-    reservation_id = int(input('Which reservation do you want to manage? >'))
+    while True:
+        try:
+            reservation_id = int(
+                input('Which reservation do you want to manage? >'))
+            break
+        except ValueError:
+            print('Sorry, that didn\'t work. Please try again.')
+            continue
     try:
         reservation = get_reservation(reservation_id, hotel_id, database)
         reservation = Reservation(reservation[0], database)
@@ -495,8 +502,14 @@ def cancel_reservation(hotel_id, database):
     c = conn.cursor()
     while True:
         get_reservations(hotel_id, database)
-        reservation_id = int(
-            input('Which reservation do you want to manage? >'))
+        while True:
+            try:
+                reservation_id = int(
+                    input('Which reservation do you want to manage? >'))
+                break
+            except ValueError:
+                print('Sorry, that didn\'t work. Please try again.')
+                continue
         try:
             reservation = get_reservation(reservation_id, hotel_id, database)
             reservation = Reservation(reservation[0], database)
@@ -550,12 +563,12 @@ def main():
     while True:
         thing = get_user_options(
             'What do you want to do? \n0. Back\n1. Manage Guest \n2. Manage Reservation\n>')
-        if int(thing) == 1:
+        if thing == 1:
             guest_thing = get_user_options(
                 'What do you want to do? \n0. Back\n1. Create Guest, \n2. Retrieve Guest \n3. Edit Guest Information \n>')
-            if int(guest_thing) == 1:
+            if guest_thing == 1:
                 create_guest(database)
-            elif int(guest_thing) == 2:
+            elif guest_thing == 2:
                 while True:
                     try:
                         guest = get_guest(database)
@@ -565,20 +578,20 @@ def main():
                         continue
                 print(f'Name: {guest.name}\nPhone: {guest.phone_number}')
                 input("Press Enter to continue...")
-            elif int(guest_thing) == 3:
+            elif guest_thing == 3:
                 edit_guest(database)
             else:
                 continue
-        elif int(thing) == 2:
+        elif thing == 2:
             reservation_thing = get_user_options(
                 'What do you want to do? \n0. Back\n1. New Reservation, \n2. View Reservation, \n3. Edit An Existing Reservation, \n4. Cancel Reservation\n>')
-            if int(reservation_thing) == 1:
+            if reservation_thing == 1:
                 create_reservation(hotel_id, database)
-            elif int(reservation_thing) == 2:
+            elif reservation_thing == 2:
                 get_reservations(hotel_id, database)
-            elif int(reservation_thing) == 3:
+            elif reservation_thing == 3:
                 edit_reservation(hotel_id, database)
-            elif int(reservation_thing) == 4:
+            elif reservation_thing == 4:
                 cancel_reservation(hotel_id, database)
             else:
                 break
