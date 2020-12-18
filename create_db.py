@@ -29,7 +29,7 @@ def create_rooms(db_name):
     c = conn.cursor()
     c.execute('DELETE FROM rooms')
     conn.commit()
-    for number in range(101):
+    for number in range(1, 101):
         if number < 21:
             room_number = 100 + number
         elif 20 < number < 41:

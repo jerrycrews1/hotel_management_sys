@@ -570,7 +570,7 @@ def main():
     create_db_tables(database)
     create_room_types(database)
     create_rooms(database)
-    
+
     print('Welcome to the Hotel Management System.')
     hotel_thing = get_user_options(
         'Which are you doing? \n0. Exit\n1. Managing an Existing Hotel, or \n2. Creating a New Hotel? \n>')
