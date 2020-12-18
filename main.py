@@ -387,6 +387,9 @@ def get_reservations(hotel_id, database):
 
     Returns:
         (list): A list of reservation objects.
+        (list): A list of options (ints) that the user can choose from.
+                This prevents the user from selecting a reservation id
+                other than one listed for a specific guest.
     """
     conn = sqlite3.connect(database)
     c = conn.cursor()
@@ -404,10 +407,11 @@ def get_reservations(hotel_id, database):
     c.execute(query, (phone_number, hotel_id))
     # Print the reservations for the specific guest and have them select which reservation by id.
     reservations = c.fetchall()
-    for reservation in reservations:
+    options = [reservation[0] for reservation in reservations]
+    for index, reservation in enumerate(reservations):
         print(
-            f'{reservation[0]}: Check In: {reservation[2]} Check Out {reservation[3]} Amount: ${reservation[4]}')
-    return reservations
+            f'{index + 1}: Check In: {reservation[2]} Check Out {reservation[3]} Amount: ${reservation[4]}')
+    return reservations, options
 
 
 def edit_reservation(hotel_id, database):
@@ -423,11 +427,20 @@ def edit_reservation(hotel_id, database):
     Returns:
         (obj): A reservation object.
     """
-    get_reservations(hotel_id, database)
+    _, options = get_reservations(hotel_id, database)
     while True:
+        
         try:
-            reservation_id = int(
+            user_choice = int(
                 input('Which reservation do you want to manage? >'))
+            try:
+                reservation_id = options[user_choice]
+            except IndexError:
+                print('Sorry, that wasn\'t an option. Please try again.')
+                continue
+            if reservation_id not in options:
+                print('Sorry, that wasn\'t an option. Please try again.')
+                continue
             break
         except ValueError:
             print('Sorry, that didn\'t work. Please try again.')
@@ -500,16 +513,23 @@ def cancel_reservation(hotel_id, database):
 
     conn = sqlite3.connect(database)
     c = conn.cursor()
+    _, options = get_reservations(hotel_id, database)
     while True:
-        get_reservations(hotel_id, database)
-        while True:
+        
+        try:
+            user_choice = int(
+                input('Which reservation do you want to manage? >'))
             try:
-                reservation_id = int(
-                    input('Which reservation do you want to manage? >'))
-                break
-            except ValueError:
-                print('Sorry, that didn\'t work. Please try again.')
+                reservation_id = options[user_choice - 1]
+            except IndexError:
+                print('Sorry, that wasn\'t an option. Please try again.')
                 continue
+            if reservation_id not in options:
+                print('Sorry, that wasn\'t an option. Please try again.')
+                continue
+        except ValueError:
+            print('Sorry, that didn\'t work. Please try again.')
+            continue
         try:
             reservation = get_reservation(reservation_id, hotel_id, database)
             reservation = Reservation(reservation[0], database)
