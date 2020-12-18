@@ -43,3 +43,10 @@ def test_entering_guest_in_db(setup_test_guests):
     c.execute('SELECT * FROM guests')
     guests = c.fetchall()
     assert len(guests) == 4
+
+def test_create_rooms():
+    conn = sqlite3.connect('test.db')
+    c = conn.cursor()
+    c.execute ('SELECT COUNT(*) FROM rooms')
+    num_of_rooms = c.fetchall()
+    assert num_of_rooms[0][0] == 101
