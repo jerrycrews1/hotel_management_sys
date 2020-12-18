@@ -566,10 +566,11 @@ def main():
     the tables.
 
     """
-    # create_db_tables('hotel.db')
-    # create_room_types('hotel.db')
-    # create_rooms('hotel.db')
     database = 'hotel.db'
+    create_db_tables(database)
+    create_room_types(database)
+    create_rooms(database)
+    
     print('Welcome to the Hotel Management System.')
     hotel_thing = get_user_options(
         'Which are you doing? \n0. Exit\n1. Managing an Existing Hotel, or \n2. Creating a New Hotel? \n>')
