@@ -5,22 +5,22 @@ import random
 def create_db_tables(db_name):
     conn = sqlite3.connect(db_name)
     c = conn.cursor()
-    c.execute('''CREATE TABLE hotels (hotel_id INTEGER PRIMARY KEY AUTOINCREMENT, hotel_name TEXT NOT NULL, tax_perc DECIMAL(2, 2))''')
+    c.execute('''CREATE TABLE IF NOT EXISTS hotels (hotel_id INTEGER PRIMARY KEY AUTOINCREMENT, hotel_name TEXT NOT NULL, tax_perc DECIMAL(2, 2))''')
     c.execute(
-        '''CREATE TABLE room_types (room_type_id INTEGER PRIMARY KEY, description TEXT)''')
-    c.execute('''CREATE TABLE rooms (room_num INTEGER PRIMARY KEY, room_type_id INTEGER, rate DECIMAL(5, 2),
+        '''CREATE TABLE IF NOT EXISTS room_types (room_type_id INTEGER PRIMARY KEY, description TEXT)''')
+    c.execute('''CREATE TABLE IF NOT EXISTS rooms (room_num INTEGER PRIMARY KEY, room_type_id INTEGER, rate DECIMAL(5, 2),
                  FOREIGN KEY (room_type_id) REFERENCES room_types (room_type_id))''')
-    c.execute('''CREATE TABLE reservations (reservation_id INTEGER PRIMARY KEY AUTOINCREMENT, guest_id INTEGER, check_in DATETIME NOT NULL, check_out DATETIME NOT NULL, cost DECIMAL(6, 2) DEFAULT 0, hotel_id INTEGER,
+    c.execute('''CREATE TABLE IF NOT EXISTS reservations (reservation_id INTEGER PRIMARY KEY AUTOINCREMENT, guest_id INTEGER, check_in DATETIME NOT NULL, check_out DATETIME NOT NULL, cost DECIMAL(6, 2) DEFAULT 0, hotel_id INTEGER,
                  FOREIGN KEY (guest_id) REFERENCES guests (guest_id),
                  FOREIGN KEY (hotel_id) REFERENCES guests (hotel_id))''')
     c.execute(
-        '''CREATE TABLE guests (guest_id INTEGER PRIMARY KEY, phone_number INTEGER UNIQUE NOT NULL, name VARCHAR(50))''')
-    c.execute('''CREATE TABLE reservation_has_rooms (reservation_id INTEGER, room_id INTEGER,
+        '''CREATE TABLE IF NOT EXISTS guests (guest_id INTEGER PRIMARY KEY, phone_number INTEGER UNIQUE NOT NULL, name VARCHAR(50))''')
+    c.execute('''CREATE TABLE IF NOT EXISTS reservation_has_rooms (reservation_id INTEGER, room_id INTEGER,
                  FOREIGN KEY (reservation_id) REFERENCES reservations (reservation_id),
                  FOREIGN KEY (room_id) REFERENCES rooms (room_id))''')
-    c.execute('''CREATE TABLE cancellations (cancellation_id INTEGER PRIMARY KEY NOT NULL, reservation_id INTEGER,
+    c.execute('''CREATE TABLE IF NOT EXISTS cancellations (cancellation_id INTEGER PRIMARY KEY NOT NULL, reservation_id INTEGER,
                  FOREIGN KEY (reservation_id) REFERENCES reservations (reservation_id))''')
-    c.execute('''CREATE TABLE reservations_archive (reservation_id INTEGER PRIMARY KEY, guest_id INTEGER, check_in DATETIME NOT NULL, check_out DATETIME NOT NULL,
+    c.execute('''CREATE TABLE IF NOT EXISTS reservations_archive (reservation_id INTEGER PRIMARY KEY, guest_id INTEGER, check_in DATETIME NOT NULL, check_out DATETIME NOT NULL,
                  FOREIGN KEY (guest_id) REFERENCES guests (guest_id))''')
 
 
