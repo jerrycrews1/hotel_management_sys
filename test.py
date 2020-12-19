@@ -65,9 +65,6 @@ def test_phone_number():
     error1 = '93846283'
     error2 = '91826402859'
     error3 = '2'
-    assert len(error1) != '10', \
-        "phone number should be 10 digits"
-    assert len(error2) != '10', \
-        "phone number should be 10 digits"
-    assert len(error3) != '10', \
-        "phone number should be 10 digits"
+    assert len(error1) != '10'
+    assert len(error2) != '10'
+    assert len(error3) != '10'
