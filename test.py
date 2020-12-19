@@ -51,3 +51,23 @@ def test_create_rooms():
     c.execute ('SELECT COUNT(*) FROM rooms')
     num_of_rooms = c.fetchall()
     assert num_of_rooms[0][0] == 100
+
+def test_phone_number():
+    """ Test the length of phone number is 10 digits """
+    guest1 = '1234567890'
+    guest2 = '8567978345'
+    guest3 = '4107851467'
+    assert len(guest1) == 10
+    assert len(guest2) == 10
+    assert len(guest3) == 10
+    
+    """ raises error if numbers don't equal 10 """
+    error1 = '93846283'
+    error2 = '91826402859'
+    error3 = '2'
+    assert len(error1) != '10', \
+        "phone number should be 10 digits"
+    assert len(error2) != '10', \
+        "phone number should be 10 digits"
+    assert len(error3) != '10', \
+        "phone number should be 10 digits"
