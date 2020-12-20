@@ -44,13 +44,15 @@ def test_entering_guest_in_db(setup_test_guests):
     guests = c.fetchall()
     assert len(guests) == 4
 
+
 def test_create_rooms():
     """ Test for the creation of exactly 101 rooms in the DB. """
     conn = sqlite3.connect('test.db')
     c = conn.cursor()
-    c.execute ('SELECT COUNT(*) FROM rooms')
+    c.execute('SELECT COUNT(*) FROM rooms')
     num_of_rooms = c.fetchall()
     assert num_of_rooms[0][0] == 100
+
 
 def test_phone_number():
     """ Test the length of phone number is 10 digits """
@@ -60,7 +62,7 @@ def test_phone_number():
     assert len(guest1) == 10
     assert len(guest2) == 10
     assert len(guest3) == 10
-    
+
     """ raises error if numbers don't equal 10 """
     error1 = '93846283'
     error2 = '91826402859'
@@ -69,11 +71,12 @@ def test_phone_number():
     assert len(error2) != '10'
     assert len(error3) != '10'
 
+
 def test_test():
     """ Tests that the rate for each room type is correct. """
     conn = sqlite3.connect('test.db')
     c = conn.cursor()
-    c.execute ('SELECT * FROM rooms GROUP BY room_type_id')
+    c.execute('SELECT * FROM rooms GROUP BY room_type_id')
     room_types = c.fetchall()
     assert room_types[0][2] == 301
     assert room_types[1][2] == 148

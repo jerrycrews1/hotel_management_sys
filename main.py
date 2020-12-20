@@ -6,7 +6,6 @@ necessary for operating a hotel.
 import sys
 import datetime
 import sqlite3
-# from room import Room
 from guest import Guest
 from hotel import Hotel
 from reservation import Reservation
