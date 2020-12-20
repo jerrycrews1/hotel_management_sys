@@ -68,3 +68,14 @@ def test_phone_number():
     assert len(error1) != '10'
     assert len(error2) != '10'
     assert len(error3) != '10'
+
+def test_test():
+    """ Tests that the rate for each room type is correct. """
+    conn = sqlite3.connect('test.db')
+    c = conn.cursor()
+    c.execute ('SELECT * FROM rooms GROUP BY room_type_id')
+    room_types = c.fetchall()
+    assert room_types[0][2] == 301
+    assert room_types[1][2] == 148
+    assert room_types[2][2] == 103
+    assert room_types[3][2] == 79
