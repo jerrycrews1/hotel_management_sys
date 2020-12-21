@@ -59,6 +59,6 @@ class Guest:
         """
         self.name = new_name
         c = self.conn.cursor()
-        c.execute('UPDATE guests SET new_name = ? WHERE guest_id = ?',
-                  (self.name, self.guest_id))
+        c.execute('UPDATE guests SET name = ? WHERE guest_id = ?',
+                  (new_name, self.guest_id))
         self.conn.commit()
